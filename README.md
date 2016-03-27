@@ -115,14 +115,11 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 	  DecodedArray := B32.Decode(EncodedString);
 	  // Property that allows you to modifies The Encoding of the Created Instance.
 	  B32.Encoding := TEncoding.Unicode;
-	  // Property that allows you to get The Base Alphabets used to perform the 
-      Encoding.
+	  // Property that allows you to get The Base Alphabets used to perform the Encoding.
 	  BaseAlphabet := B32.Alphabet;
-	  // Property that allows you to get The Base Char (Padder) used to perform the 
-      Encoding.
+	  // Property that allows you to get The Base Char (Padder) used to perform the Encoding.
 	  BaseSpecial := B32.Special;
-	  // There are some other important properties but those are left for you to 
-      //figure out. :)
+	 // There are some other important properties but those are left for you to figure out. :)
 	  // Also no need to "Free" the Created Instance Since it is Reference Counted.
    end;
 ```    
