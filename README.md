@@ -103,7 +103,7 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 	  BaseSpecial: Char;
 	begin
 	  // Creates a Base32 Instance with Default Values. You can Specify your Desired 
-      Parameters During Creation of the Instance.
+	  // Parameters During Creation of the Instance.
 	  B32 := TBase32.Create();
 	  // Accepts a String and Encodes it Internally using UTF8 as the Default Encoding
 	  EncodedString := B32.EncodeString('TestValue');
@@ -120,7 +120,7 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 	  // Property that allows you to get The Base Char (Padder) used to perform the Encoding.
 	  BaseSpecial := B32.Special;
 	 // There are some other important properties but those are left for you to figure out. :)
-	  // Also no need to "Free" the Created Instance Since it is Reference Counted.
+	 // Also no need to "Free" the Created Instance Since it is Reference Counted.
    end;
 ```    
   
