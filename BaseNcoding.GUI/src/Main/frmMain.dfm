@@ -424,6 +424,7 @@ object Form1: TForm1
     Top = 446
     Width = 146
     Height = 13
+    Anchors = [akTop, akRight]
     Caption = 'Max Compression'
     TabOrder = 25
   end
