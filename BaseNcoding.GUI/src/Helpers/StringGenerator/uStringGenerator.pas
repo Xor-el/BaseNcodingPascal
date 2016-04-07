@@ -100,7 +100,7 @@ var
 
 begin
   Result := '';
-  tempResult := TStringBuilder.Create;
+  tempResult := TStringBuilder.Create(size);
   try
     Randomize;
     if (onlyLettersAndDigits) then
@@ -112,9 +112,9 @@ begin
       begin
         tempResult.Append(lettersAndDigits
           [Random(Length(lettersAndDigits)) + 1]);
-        Result := tempResult.ToString;
         Inc(i);
       end;
+      Result := tempResult.ToString;
     end
     else
     begin
@@ -125,12 +125,9 @@ begin
 
       begin
         data[i] := Byte(RandomRange(32, 127));
-
-        Result := TEncoding.ASCII.GetString(data);
-
         Inc(i);
       end;
-
+      Result := TEncoding.ASCII.GetString(data);
     end;
 
   finally
