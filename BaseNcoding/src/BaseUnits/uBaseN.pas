@@ -1,6 +1,9 @@
 unit uBaseN;
 
 {$ZEROBASEDSTRINGS ON}
+{$IF CompilerVersion >= 28}  // XE7 and Above
+{$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
+{$ENDIF}
 
 interface
 
@@ -8,6 +11,10 @@ uses
 
   System.SysUtils,
   System.Math,
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  System.Classes,
+  System.Threading,
+{$ENDIF}
   uBase,
   uUtils;
 
@@ -41,7 +48,11 @@ type
     property BlockMaxBitsCount: UInt32 read GetBlockMaxBitsCount;
     function GetReverseOrder: Boolean;
     property ReverseOrder: Boolean read GetReverseOrder;
-
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    function GetParallel: Boolean;
+    procedure SetParallel(value: Boolean);
+    property Parallel: Boolean read GetParallel write SetParallel;
+{$ENDIF}
   end;
 
   TBaseN = class(TBase, IBaseN)
@@ -72,7 +83,10 @@ type
   public
 
     constructor Create(const _Alphabet: String; _blockMaxBitsCount: UInt32 = 32;
-      _Encoding: TEncoding = Nil; _reverseOrder: Boolean = False);
+      _Encoding: TEncoding = Nil;
+      _reverseOrder: Boolean = False{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+      ; _parallel: Boolean = False
+{$ENDIF});
 
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
@@ -86,13 +100,17 @@ implementation
 
 constructor TBaseN.Create(const _Alphabet: String;
   _blockMaxBitsCount: UInt32 = 32; _Encoding: TEncoding = Nil;
-  _reverseOrder: Boolean = False);
+  _reverseOrder: Boolean = False{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  ; _parallel: Boolean = False
+{$ENDIF});
 var
   charsCountInBits: LongWord;
   pow: UInt64;
   i: Integer;
 begin
-  Inherited Create(UInt32(Length(_Alphabet)), _Alphabet, Char(0), _Encoding);
+  Inherited Create(UInt32(Length(_Alphabet)), _Alphabet, Char(0),
+    _Encoding{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}, _parallel{$ENDIF});
+
   FHaveSpecial := False;
   BlockMaxBitsCount := _blockMaxBitsCount;
 
@@ -117,7 +135,10 @@ end;
 function TBaseN.Encode(data: TArray<Byte>): String;
 var
   mainBitsLength, tailBitsLength, mainCharsCount, tailCharsCount,
-    globalCharsCount, iterationCount: Integer;
+    globalCharsCount,
+    iterationCount{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}, processorCount,
+    beginInd, endInd
+{$ENDIF}: Integer;
   bits: UInt64;
   tempResult: TArray<Char>;
 
@@ -136,7 +157,31 @@ begin
   iterationCount := mainCharsCount div BlockCharsCount;
 
   SetLength(tempResult, globalCharsCount);
+
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  if (not Parallel) then
+  begin
+    EncodeBlock(data, tempResult, 0, iterationCount);
+  end
+  else
+  begin
+    processorCount := Min(iterationCount, TThread.processorCount);
+
+    TParallel.&For(0, processorCount - 1,
+      procedure(idx: Integer)
+      begin
+
+        beginInd := idx * iterationCount div processorCount;
+        endInd := (idx + 1) * iterationCount div processorCount;
+
+        EncodeBlock(data, tempResult, beginInd, endInd);
+      end);
+
+  end;
+
+{$ELSE}
   EncodeBlock(data, tempResult, 0, iterationCount);
+{$ENDIF}
   if (tailBitsLength <> 0) then
   begin
     bits := GetBits64(data, mainBitsLength, tailBitsLength);
@@ -149,7 +194,10 @@ end;
 function TBaseN.Decode(const data: String): TArray<Byte>;
 var
   mainBitsLength, tailBitsLength, mainCharsCount, tailCharsCount,
-    iterationCount, globalBitsLength: Integer;
+    iterationCount,
+    globalBitsLength{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)},
+    processorCount, beginInd, endInd
+{$ENDIF}: Integer;
   bits, tailBits: UInt64;
   tempResult: TArray<Byte>;
 
@@ -183,8 +231,27 @@ begin
   iterationCount := mainCharsCount div BlockCharsCount;
 
   SetLength(tempResult, globalBitsLength div 8);
-  DecodeBlock(data, tempResult, 0, iterationCount);
 
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  if (not Parallel) then
+  begin
+    DecodeBlock(data, tempResult, 0, iterationCount);
+  end
+  else
+  begin
+    processorCount := Min(iterationCount, TThread.processorCount);
+    TParallel.&For(0, processorCount - 1,
+      procedure(idx: Integer)
+      begin
+        beginInd := idx * iterationCount div processorCount;
+        endInd := (idx + 1) * iterationCount div processorCount;
+        DecodeBlock(data, tempResult, beginInd, endInd);
+      end);
+  end;
+
+{$ELSE}
+  DecodeBlock(data, tempResult, 0, iterationCount);
+{$ENDIF}
   if (tailCharsCount <> 0) then
   begin
 
@@ -196,13 +263,14 @@ begin
 end;
 
 procedure TBaseN.EncodeBlock(src: TArray<Byte>; dst: TArray<Char>;
-  beginInd, endInd: Integer);
+beginInd, endInd: Integer);
 
 var
   ind, charInd, bitInd: Integer;
   bits: UInt64;
 
 begin
+
   for ind := beginInd to Pred(endInd) do
   begin
     charInd := ind * Integer(BlockCharsCount);
@@ -210,10 +278,11 @@ begin
     bits := GetBits64(src, bitInd, BlockBitsCount);
     BitsToChars(dst, charInd, Integer(BlockCharsCount), bits);
   end;
+
 end;
 
 procedure TBaseN.DecodeBlock(const src: String; dst: TArray<Byte>;
-  beginInd, endInd: Integer);
+beginInd, endInd: Integer);
 
 var
   ind, charInd, bitInd: Integer;
@@ -230,7 +299,7 @@ begin
 end;
 
 procedure TBaseN.BitsToChars(chars: TArray<Char>; ind, count: Integer;
-  block: UInt64);
+block: UInt64);
 var
   i: Integer;
 begin
@@ -275,12 +344,13 @@ begin
 end;
 
 function TBaseN.GetBits64(data: TArray<Byte>;
-  bitPos, bitsCount: Integer): UInt64;
+bitPos, bitsCount: Integer): UInt64;
 var
   currentBytePos, currentBitInBytePos, xLength, x2Length: Integer;
   a: UInt64;
 
 begin
+
   result := UInt64(0);
   currentBytePos := bitPos div 8;
   currentBitInBytePos := bitPos mod 8;
@@ -315,12 +385,13 @@ begin
     end;
 
   end;
+
 end;
 
 {$OVERFLOWCHECKS OFF}
 
 procedure TBaseN.AddBits64(data: TArray<Byte>; value: UInt64;
-  bitPos, bitsCount: Integer);
+bitPos, bitsCount: Integer);
 var
   currentBytePos, currentBitInBytePos, xLength, x2Length: Integer;
   x1, x2: Byte;

@@ -1,6 +1,9 @@
 unit uBase;
 
 {$ZEROBASEDSTRINGS ON}
+{$IF CompilerVersion >= 28}  // XE7 and Above
+{$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
+{$ENDIF}
 
 interface
 
@@ -37,7 +40,11 @@ type
     function GetEncoding: TEncoding;
     procedure SetEncoding(value: TEncoding);
     property Encoding: TEncoding read GetEncoding write SetEncoding;
-
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    function GetParallel: Boolean;
+    procedure SetParallel(value: Boolean);
+    property Parallel: Boolean read GetParallel write SetParallel;
+{$ENDIF}
   end;
 
   TBase = class abstract(TInterfacedObject, IBase)
@@ -58,7 +65,10 @@ type
     function GetHaveSpecial: Boolean;
     function GetEncoding: TEncoding;
     procedure SetEncoding(value: TEncoding);
-
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    function GetParallel: Boolean;
+    procedure SetParallel(value: Boolean);
+{$ENDIF}
   protected
 
   class var
@@ -68,11 +78,16 @@ type
     FSpecial: Char;
     FHaveSpecial: Boolean;
     FEncoding: TEncoding;
-
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    FParallel: Boolean;
+{$ENDIF}
   public
 
     constructor Create(_charsCount: LongWord; const _alphabet: String;
-      const _special: Char; _encoding: TEncoding = Nil);
+      const _special: Char;
+      _encoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+      ; _parallel: Boolean = False
+{$ENDIF});
     function EncodeString(const data: String): String; virtual;
     function Encode(data: TArray<Byte>): String; virtual; abstract;
     function DecodeToString(const data: String): String; virtual;
@@ -115,7 +130,9 @@ type
     property Special: Char read GetSpecial write SetSpecial;
     property HaveSpecial: Boolean read GetHaveSpecial;
     property Encoding: TEncoding read GetEncoding write SetEncoding;
-
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    property Parallel: Boolean read GetParallel write SetParallel;
+{$ENDIF}
   protected
 
     FInvAlphabet: TArray<Integer>;
@@ -125,7 +142,10 @@ type
 implementation
 
 constructor TBase.Create(_charsCount: LongWord; const _alphabet: String;
-  const _special: Char; _encoding: TEncoding = Nil);
+  const _special: Char;
+  _encoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  ; _parallel: Boolean = False
+{$ENDIF});
 var
   i, j, alphabetMax, bitsPerChar: Integer;
 
@@ -177,6 +197,9 @@ begin
   else
     Encoding := TEncoding.UTF8;
 
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  Parallel := _parallel;
+{$ENDIF}
 end;
 
 function TBase.GetBitsPerChars: Double;
@@ -251,6 +274,20 @@ procedure TBase.SetEncoding(value: TEncoding);
 begin
   FEncoding := value;
 end;
+
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+
+function TBase.GetParallel: Boolean;
+begin
+  result := FParallel;
+end;
+
+procedure TBase.SetParallel(value: Boolean);
+begin
+  FParallel := value;
+end;
+
+{$ENDIF}
 
 function TBase.EncodeString(const data: String): String;
 

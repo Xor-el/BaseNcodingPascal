@@ -96,7 +96,7 @@ var
   i: Integer;
   lettersAndDigits: String;
   tempResult: TStringBuilder;
-  data: TBytes;
+  data: TArray<Byte>;
 
 begin
   Result := '';

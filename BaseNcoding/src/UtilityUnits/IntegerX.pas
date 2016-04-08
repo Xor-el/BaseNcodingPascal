@@ -1480,11 +1480,11 @@ begin
   most := UInt32(v shr BitsPerDigit);
   if (most = 0) then
   begin
-    result := TIntegerX.Create(1, [UInt32(v)]);
+    result := TIntegerX.Create(1, TArray<UInt32>.Create(UInt32(v)));
     Exit;
   end
   else
-    result := TIntegerX.Create(1, [most, UInt32(v)]);
+    result := TIntegerX.Create(1, TArray<UInt32>.Create(most, UInt32(v)));
 end;
 
 class function TIntegerX.Create(v: UInt32): TIntegerX;
@@ -1496,7 +1496,7 @@ begin
   end
   else
   begin
-    result := TIntegerX.Create(1, [v]);
+    result := TIntegerX.Create(1, TArray<UInt32>.Create(v));
     Exit;
   end;
 end;
@@ -1524,11 +1524,11 @@ begin
     most := UInt32(v shr BitsPerDigit);
     if (most = 0) then
     begin
-      result := TIntegerX.Create(Sign, [UInt32(v)]);
+      result := TIntegerX.Create(Sign, TArray<UInt32>.Create(UInt32(v)));
       Exit;
     end
     else
-      result := TIntegerX.Create(Sign, [most, UInt32(v)]);
+      result := TIntegerX.Create(Sign, TArray<UInt32>.Create(most, UInt32(v)));
   end;
 end;
 
@@ -2483,7 +2483,7 @@ begin
     result := ShortInt(ret);
     Exit;
   end;
-  raise EOverflowException.Create(OverFlowSmallInt);
+  raise EOverflowException.Create(OverFlowShortInt);
 end;
 
 function TIntegerX.ToWord(): Word;

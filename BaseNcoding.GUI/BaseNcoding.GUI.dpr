@@ -2,7 +2,7 @@ program BaseNcoding.GUI;
 
 uses
   Vcl.Forms,
-  frmMain in 'src\Main\frmMain.pas' {Form1},
+  frmMain in 'src\Main\frmMain.pas' {Form1} ,
   uBase in '..\BaseNcoding\src\BaseUnits\uBase.pas',
   uBase32 in '..\BaseNcoding\src\BaseUnits\uBase32.pas',
   uBase64 in '..\BaseNcoding\src\BaseUnits\uBase64.pas',

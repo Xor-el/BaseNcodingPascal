@@ -84,7 +84,7 @@ object Form1: TForm1
     Caption = 'Ratio'
   end
   object label9: TLabel
-    Left = 583
+    Left = 686
     Top = 465
     Width = 74
     Height = 15
@@ -427,5 +427,14 @@ object Form1: TForm1
     Anchors = [akTop, akRight]
     Caption = 'Max Compression'
     TabOrder = 25
+  end
+  object cbParallel: TCheckBox
+    Left = 583
+    Top = 463
+    Width = 57
+    Height = 17
+    Anchors = [akTop, akRight]
+    Caption = 'Parallel'
+    TabOrder = 26
   end
 end

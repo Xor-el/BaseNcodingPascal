@@ -12,8 +12,8 @@ type
 
   end;
 
-  // [TestFixture]
-  // [Ignore]
+   [TestFixture]
+   [Ignore]
   TBaseNcodingTests = class abstract(TInterfacedObject, IBaseNcodingTests)
 
   protected
@@ -148,6 +148,6 @@ end;
 
 initialization
 
-// TDUnitX.RegisterTestFixture(TBaseNcodingTests);
+ TDUnitX.RegisterTestFixture(TBaseNcodingTests);
 
 end.

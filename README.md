@@ -67,11 +67,8 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
         the "{$ZEROBASEDSTRINGS ON}" switch to manage String Indexing.
         I couldn't test it though since I don't have the Mobile SKU Installed.
 
-    5.  "Parallel version" was not implemented because it requires PPL 
-        (Parallel Programming Library) which was only added in XE7.
-        I know I had other options like OTL (OmniThread Library) but I 
-        don't want to include another "Large Dependency" just for a 
-        "little additional feature".
+    5.  "Parallel version" was implemented using PPL (Parallel Programming Library) 
+         but will only work in XE7 Upwards.
 
     6.  This Library was written with the Object Oriented Paradigm (Class-Based) but 
         implements memory management through reference counting with the help of 

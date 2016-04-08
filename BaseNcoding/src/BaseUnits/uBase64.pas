@@ -1,12 +1,20 @@
 unit uBase64;
 
 {$ZEROBASEDSTRINGS ON}
+{$IF CompilerVersion >= 28}  // XE7 and Above
+{$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
+{$ENDIF}
 
 interface
 
 uses
 
   System.SysUtils,
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  System.Classes,
+  System.Threading,
+  System.Math,
+{$ENDIF}
   uBase,
   uUtils;
 
@@ -36,7 +44,11 @@ type
     function GetEncoding: TEncoding;
     procedure SetEncoding(value: TEncoding);
     property Encoding: TEncoding read GetEncoding write SetEncoding;
-
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    function GetParallel: Boolean;
+    procedure SetParallel(value: Boolean);
+    property Parallel: Boolean read GetParallel write SetParallel;
+{$ENDIF}
   end;
 
   TBase64 = class(TBase, IBase64)
@@ -50,7 +62,10 @@ type
     DefaultSpecial = '=';
 
     constructor Create(const _Alphabet: String = DefaultAlphabet;
-      _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
+      _Special: Char = DefaultSpecial;
+      _textEncoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+      ; _parallel: Boolean = False
+{$ENDIF});
 
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
@@ -67,11 +82,16 @@ type
 implementation
 
 constructor TBase64.Create(const _Alphabet: String = DefaultAlphabet;
-  _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
+  _Special: Char = DefaultSpecial;
+  _textEncoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  ; _parallel: Boolean = False
+{$ENDIF});
 
 begin
 
-  Inherited Create(64, _Alphabet, _Special, _textEncoding);
+  Inherited Create(64, _Alphabet, _Special,
+    _textEncoding{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)},
+    _parallel{$ENDIF});
   FHaveSpecial := True;
 
 end;
@@ -79,7 +99,9 @@ end;
 function TBase64.Encode(data: TArray<Byte>): String;
 var
   resultLength, dataLength, tempInt, length3, ind, x1, x2, srcInd,
-    dstInd: Integer;
+    dstInd{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}, processorCount,
+    beginInd, endInd
+{$ENDIF}: Integer;
   tempResult: TArray<Char>;
 
 begin
@@ -92,8 +114,27 @@ begin
   resultLength := (dataLength + 2) div 3 * 4;
   SetLength(tempResult, resultLength);
   length3 := Length(data) div 3;
-  EncodeBlock(data, tempResult, 0, length3);
 
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  if (not Parallel) then
+  begin
+    EncodeBlock(data, tempResult, 0, length3)
+  end
+  else
+  begin
+    processorCount := Min(length3, TThread.processorCount);
+    TParallel.&For(0, processorCount - 1,
+      procedure(idx: Integer)
+      begin
+        beginInd := idx * length3 div processorCount;
+        endInd := (idx + 1) * length3 div processorCount;
+        EncodeBlock(data, tempResult, beginInd, endInd);
+      end);
+  end;
+
+{$ELSE}
+  EncodeBlock(data, tempResult, 0, length3);
+{$ENDIF}
   tempInt := (dataLength - length3 * 3);
 
   case tempInt of
@@ -128,7 +169,7 @@ begin
 end;
 
 procedure TBase64.EncodeBlock(src: TArray<Byte>; dst: TArray<Char>;
-  beginInd, endInd: Integer);
+beginInd, endInd: Integer);
 var
   ind, srcInd, dstInd: Integer;
   x1, x2, x3: Byte;
@@ -152,7 +193,9 @@ end;
 function TBase64.Decode(const data: String): TArray<Byte>;
 var
   lastSpecialInd, tailLength, resultLength, length4, ind, x1, x2, x3, srcInd,
-    dstInd: Integer;
+    dstInd{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}, processorCount,
+    beginInd, endInd
+{$ENDIF}: Integer;
   tempResult: TArray<Byte>;
 
 begin
@@ -173,7 +216,27 @@ begin
   resultLength := (Length(data) + 3) div 4 * 3 - tailLength;
   SetLength(tempResult, resultLength);
   length4 := (Length(data) - tailLength) div 4;
+
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  if (not Parallel) then
+  begin
+    DecodeBlock(data, tempResult, 0, length4);
+  end
+  else
+  begin
+    processorCount := Min(length4, TThread.processorCount);
+    TParallel.&For(0, processorCount - 1,
+      procedure(idx: Integer)
+      begin
+        beginInd := idx * length4 div processorCount;
+        endInd := (idx + 1) * length4 div processorCount;
+        DecodeBlock(data, tempResult, beginInd, endInd);
+      end);
+  end;
+
+{$ELSE}
   DecodeBlock(data, tempResult, 0, length4);
+{$ENDIF}
   Case tailLength of
     2:
       begin
@@ -203,7 +266,7 @@ end;
 {$OVERFLOWCHECKS OFF}
 
 procedure TBase64.DecodeBlock(const src: String; dst: TArray<Byte>;
-  beginInd, endInd: Integer);
+beginInd, endInd: Integer);
 var
   ind, srcInd, dstInd, x1, x2, x3, x4: Integer;
 

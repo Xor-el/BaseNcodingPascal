@@ -1,9 +1,14 @@
 unit Base64Tests;
 
+{$IF CompilerVersion >= 28}  // XE7 and Above
+{$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
+{$ENDIF}
+
 interface
 
 uses
-  System.NetEncoding, System.SysUtils, DunitX.TestFramework, BaseTests, uBase64;
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)} System.NetEncoding, {$ELSE} System.Classes, Soap.EncdDecd, {$ENDIF}
+  System.SysUtils, DunitX.TestFramework, BaseTests, uBase64;
 
 type
 
@@ -44,17 +49,28 @@ var
 begin
   encoded := FConverter.EncodeString(str);
   base64standard := Helper(str);
-  base64standard := StringReplace(base64standard, sLineBreak, '',
-    [rfReplaceAll]);
   Assert.AreEqual(base64standard, encoded);
 end;
 
 class function TBase64Tests.Helper(const InString: String): String;
 var
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
   temp: TArray<Byte>;
+{$ELSE} temp: TStringStream; {$ENDIF}
 begin
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
   temp := TEncoding.UTF8.GetBytes(InString);
-  result := TNetEncoding.Base64.EncodeBytesToString(temp);
+{$ELSE}
+  temp := TStringStream.Create(InString, TEncoding.UTF8);
+{$ENDIF}
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)} result := StringReplace(TNetEncoding.Base64.EncodeBytesToString(temp), sLineBreak, '', [rfReplaceAll]); {$ELSE}
+  try
+    result := StringReplace(String(EncodeBase64(temp.Memory, temp.Size)), sLineBreak, '', [rfReplaceAll]);
+  finally
+    temp.Free;
+  end;
+
+{$ENDIF}
 end;
 
 initialization

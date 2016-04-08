@@ -1,9 +1,23 @@
 unit BaseNTests;
 
+{$ZEROBASEDSTRINGS ON}
+{$IF CompilerVersion >= 28}  // XE7 and Above
+{$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
+{$ENDIF}
+
 interface
 
 uses
-  System.Generics.Collections, System.Math, System.NetEncoding, System.SysUtils,
+  System.Generics.Collections, System.Math, System.SysUtils,
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+  System.Diagnostics,
+  System.NetEncoding,
+  System.Threading,
+  System.TimeSpan,
+{$ELSE}
+  System.Classes,
+  Soap.EncdDecd,
+{$ENDIF}
   DUnitX.TestFramework,
   BaseTests, uBase64,
   uBaseN, uBaseBigN, uStringGenerator;
@@ -32,6 +46,10 @@ type
     procedure EncodeDecodeBaseBigN();
     [Test]
     procedure EncodeDecodeBaseBigNMaxCompression();
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    [Test]
+    procedure EncodeDecodeParallel();
+{$ENDIF}
   end;
 
 implementation
@@ -45,17 +63,28 @@ begin
   _converter := TBaseN.Create(TBase64.DefaultAlphabet);
   encoded := _converter.EncodeString(s);
   base64standard := Helper(s);
-  base64standard := StringReplace(base64standard, sLineBreak, '',
-    [rfReplaceAll]);
   Assert.AreEqual(base64standard, encoded);
 end;
 
 class function TBaseNTests.Helper(const InString: String): String;
 var
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
   temp: TArray<Byte>;
+{$ELSE} temp: TStringStream; {$ENDIF}
 begin
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
   temp := TEncoding.UTF8.GetBytes(InString);
-  result := TNetEncoding.Base64.EncodeBytesToString(temp);
+{$ELSE}
+  temp := TStringStream.Create(InString, TEncoding.UTF8);
+{$ENDIF}
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)} result := StringReplace(TNetEncoding.Base64.EncodeBytesToString(temp), sLineBreak, '', [rfReplaceAll]); {$ELSE}
+  try
+    result := StringReplace(String(EncodeBase64(temp.Memory, temp.Size)), sLineBreak, '', [rfReplaceAll]);
+  finally
+    temp.Free;
+  end;
+
+{$ENDIF}
 end;
 
 procedure TBaseNTests.ReverseOrder();
@@ -196,7 +225,8 @@ begin
     for radix := 2 to Pred(1000) do
     begin
       baseN := TBaseBigN.Create(TStringGenerator.GetAlphabet(Integer(radix)),
-        256, Nil, False, True);
+        256, Nil, False, {$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)} False,
+{$ENDIF} True);
       testBytesCount := Max((baseN.BlockBitsCount + 7) div 8,
         (baseN.BlockCharsCount));
       bytes.Clear;
@@ -217,6 +247,61 @@ begin
     bytes.Free;
   end;
 end;
+
+{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+
+procedure TBaseNTests.EncodeDecodeParallel();
+var
+  randomString, Alpha, baseNEncoded, baseNEncodedParallel, baseNDecoded,
+    baseNDecodedParallel: String;
+  baseN: IBaseN;
+  stopwatch: TStopWatch;
+  baseNTime, baseNParallelTime: TTimeSpan;
+
+begin
+
+  randomString := TStringGenerator.GetRandom(10000000, True);
+  Alpha := TStringGenerator.GetAlphabet(85);
+  baseN := TBaseN.Create(Alpha);
+
+  // Encoding Part
+
+  stopwatch := TStopWatch.Create;
+  stopwatch.Start;
+  baseNEncoded := baseN.EncodeString(randomString);
+  stopwatch.Stop;
+  baseNTime := stopwatch.Elapsed;
+
+  stopwatch := TStopWatch.Create;
+  stopwatch.Start;
+  baseN.Parallel := True;
+  baseNEncodedParallel := baseN.EncodeString(randomString);
+  stopwatch.Stop;
+  baseNParallelTime := stopwatch.Elapsed;
+  Assert.AreEqual(baseNEncoded, baseNEncodedParallel);
+  Assert.IsTrue(baseNParallelTime < baseNTime);
+
+  // Decoding Part
+
+  stopwatch := TStopWatch.Create;
+  stopwatch.Start;
+  baseN.Parallel := False;
+  baseNDecoded := baseN.DecodeToString(baseNEncoded);
+  stopwatch.Stop;
+  baseNTime := stopwatch.Elapsed;
+
+  stopwatch := TStopWatch.Create;
+  stopwatch.Start;
+  baseN.Parallel := True;
+  baseNDecodedParallel := baseN.DecodeToString(baseNEncodedParallel);
+  stopwatch.Stop;
+  baseNParallelTime := stopwatch.Elapsed;
+  Assert.AreEqual(baseNDecoded, baseNDecodedParallel);
+  Assert.IsTrue(baseNParallelTime < baseNTime);
+
+end;
+
+{$ENDIF}
 
 initialization
 
