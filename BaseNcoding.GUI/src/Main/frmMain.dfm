@@ -125,7 +125,7 @@ object Form1: TForm1
   end
   object label14: TLabel
     Left = 8
-    Top = 359
+    Top = 360
     Width = 41
     Height = 18
     Caption = 'Output'
@@ -360,7 +360,7 @@ object Form1: TForm1
     Top = 57
     Width = 571
     Height = 272
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Anchors = [akLeft, akRight]
     ScrollBars = ssVertical
     TabOrder = 19
     OnChange = mInputChange
@@ -370,8 +370,8 @@ object Form1: TForm1
     Left = 6
     Top = 383
     Width = 571
-    Height = 296
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Height = 272
+    Anchors = [akLeft, akRight]
     ReadOnly = True
     ScrollBars = ssVertical
     TabOrder = 20
