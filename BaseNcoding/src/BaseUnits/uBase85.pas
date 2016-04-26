@@ -319,7 +319,7 @@ begin
 
   while i < count do
   begin
-    sb.Append(DefaultAlphabet[encodedBlock[i]]);
+    sb.Append(Alphabet[encodedBlock[i]]);
     Inc(i);
   end;
 
