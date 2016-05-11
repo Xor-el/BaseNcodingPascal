@@ -1,6 +1,5 @@
 unit BaseNTests;
 
-{$ZEROBASEDSTRINGS ON}
 {$IF CompilerVersion >= 28}  // XE7 and Above
 {$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
 {$ENDIF}
@@ -79,7 +78,8 @@ begin
 {$ENDIF}
 {$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)} result := StringReplace(TNetEncoding.Base64.EncodeBytesToString(temp), sLineBreak, '', [rfReplaceAll]); {$ELSE}
   try
-    result := StringReplace(String(EncodeBase64(temp.Memory, temp.Size)), sLineBreak, '', [rfReplaceAll]);
+    result := StringReplace(String(EncodeBase64(temp.Memory, temp.Size)),
+      sLineBreak, '', [rfReplaceAll]);
   finally
     temp.Free;
   end;
@@ -114,17 +114,21 @@ begin
   Assert.AreEqual(13, TBaseN.GetOptimalBitsCount2(91, charsCountInBits));
 
   builder := TStringBuilder.Create;
-  for i := 2 to 256 do
-  begin
-    bits := TBaseBigN.GetOptimalBitsCount2(UInt32(i), charsCountInBits, 512);
-    tempDouble := (bits * 1.0);
-    ratio := tempDouble / charsCountInBits;
+  try
+    for i := 2 to 256 do
+    begin
+      bits := TBaseBigN.GetOptimalBitsCount2(UInt32(i), charsCountInBits, 512);
+      tempDouble := (bits * 1.0);
+      ratio := tempDouble / charsCountInBits;
 
-    builder.AppendLine(IntToStr(bits) + '	' + UIntToStr(charsCountInBits) + '	'
-      + FormatFloat('0.0000000', ratio));
+      builder.AppendLine(IntToStr(bits) + '	' + UIntToStr(charsCountInBits) +
+        '	' + FormatFloat('0.0000000', ratio));
+    end;
+
+    str := builder.ToString();
+  finally
+    builder.Free;
   end;
-
-  str := builder.ToString();
 
 end;
 
