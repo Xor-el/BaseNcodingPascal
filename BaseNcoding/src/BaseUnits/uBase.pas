@@ -162,7 +162,7 @@ begin
     begin
       if (_alphabet[i] = _alphabet[j]) then
         raise EArgumentException.Create
-          ('Base string should contain should contain distinct chars');
+          ('Base string should contain distinct chars');
 
     end;
 
