@@ -53,6 +53,7 @@ type
     constructor Create(const _Alphabet: String = DefaultAlphabet;
       _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
 
@@ -64,7 +65,11 @@ constructor TBase256.Create(const _Alphabet: String = DefaultAlphabet;
   _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
 begin
   Inherited Create(256, _Alphabet, _Special, _textEncoding);
-  FHaveSpecial := False;
+end;
+
+function TBase256.GetHaveSpecial: Boolean;
+begin
+  result := False;
 end;
 
 function TBase256.Encode(data: TArray<Byte>): string;

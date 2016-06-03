@@ -88,6 +88,7 @@ type
       ; _parallel: Boolean = False
 {$ENDIF});
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
     property BlockMaxBitsCount: UInt32 read GetBlockMaxBitsCount
@@ -111,7 +112,6 @@ begin
   Inherited Create(UInt32(Length(_Alphabet)), _Alphabet, Char(0),
     _Encoding{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}, _parallel{$ENDIF});
 
-  FHaveSpecial := False;
   BlockMaxBitsCount := _blockMaxBitsCount;
 
   BlockBitsCount := GetOptimalBitsCount(CharsCount, charsCountInBits,
@@ -130,6 +130,11 @@ begin
 
   F_powN[0] := pow;
   ReverseOrder := _reverseOrder;
+end;
+
+function TBaseN.GetHaveSpecial: Boolean;
+begin
+  result := False;
 end;
 
 function TBaseN.Encode(data: TArray<Byte>): String;

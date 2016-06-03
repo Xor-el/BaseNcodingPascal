@@ -45,7 +45,7 @@ type
 
   strict private
 
-    function CreateIndexByOctetAndMovePosition(data: String;
+    function CreateIndexByOctetAndMovePosition(const data: String;
       currentPosition: Integer; var index: TArray<Integer>): Integer;
 
   public
@@ -62,6 +62,7 @@ type
     constructor Create(const _Alphabet: String = DefaultAlphabet;
       _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
 
@@ -76,9 +77,12 @@ begin
   FHaveSpecial := False;
 end;
 
-{$IFNDEF _FIXINSIGHT_}  // tells FixInsight to Ignore this Function
+function TZBase32.GetHaveSpecial: Boolean;
+begin
+  result := False;
+end;
 
-function TZBase32.CreateIndexByOctetAndMovePosition(data: String;
+function TZBase32.CreateIndexByOctetAndMovePosition(const data: String;
   currentPosition: Integer; var index: TArray<Integer>): Integer;
 var
   j: Integer;
@@ -112,7 +116,6 @@ begin
 
 end;
 
-{$ENDIF}
 {$OVERFLOWCHECKS OFF}
 
 function TZBase32.Encode(data: TArray<Byte>): String;

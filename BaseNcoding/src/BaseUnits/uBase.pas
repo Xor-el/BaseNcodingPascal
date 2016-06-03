@@ -62,7 +62,6 @@ type
     procedure SetAlphabet(const value: String);
     function GetSpecial: Char;
     procedure SetSpecial(value: Char);
-    function GetHaveSpecial: Boolean;
     function GetEncoding: TEncoding;
     procedure SetEncoding(value: TEncoding);
 {$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
@@ -88,6 +87,7 @@ type
       _encoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
       ; _parallel: Boolean = False
 {$ENDIF});
+    function GetHaveSpecial: Boolean; virtual; abstract;
     function EncodeString(const data: String): String; virtual;
     function Encode(data: TArray<Byte>): String; virtual; abstract;
     function DecodeToString(const data: String): String; virtual;
@@ -258,11 +258,6 @@ end;
 procedure TBase.SetSpecial(value: Char);
 begin
   FSpecial := value;
-end;
-
-function TBase.GetHaveSpecial: Boolean;
-begin
-  result := FHaveSpecial;
 end;
 
 function TBase.GetEncoding: TEncoding;

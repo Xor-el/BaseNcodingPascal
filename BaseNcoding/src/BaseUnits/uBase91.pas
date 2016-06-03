@@ -55,6 +55,7 @@ type
     constructor Create(const _Alphabet: String = DefaultAlphabet;
       _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
 
@@ -67,10 +68,14 @@ constructor TBase91.Create(const _Alphabet: String = DefaultAlphabet;
 begin
 
   Inherited Create(91, _Alphabet, _Special, _textEncoding);
-  FHaveSpecial := False;
   BlockBitsCount := 13;
   BlockCharsCount := 2;
 
+end;
+
+function TBase91.GetHaveSpecial: Boolean;
+begin
+  result := False;
 end;
 
 function TBase91.Encode(data: TArray<Byte>): String;

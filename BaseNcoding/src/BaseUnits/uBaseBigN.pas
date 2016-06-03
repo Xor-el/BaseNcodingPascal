@@ -98,6 +98,7 @@ type
 
     class constructor BaseBigN();
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
     property BlockMaxBitsCount: UInt32 read GetBlockMaxBitsCount
@@ -122,7 +123,6 @@ var
 begin
   Inherited Create(UInt32(Length(_Alphabet)), _Alphabet, Char(0),
     _Encoding{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}, _parallel{$ENDIF});
-  FHaveSpecial := False;
   BlockMaxBitsCount := _blockMaxBitsCount;
 
   BlockBitsCount := GetOptimalBitsCount(CharsCount, charsCountInBits,
@@ -147,6 +147,11 @@ begin
     a := a * 2;
   end;
 
+end;
+
+function TBaseBigN.GetHaveSpecial: Boolean;
+begin
+  result := False;
 end;
 
 function TBaseBigN.Encode(data: TArray<Byte>): String;

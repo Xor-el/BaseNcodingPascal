@@ -80,6 +80,7 @@ type
       _Special: Char = DefaultSpecial; _prefixPostfix: Boolean = False;
       _textEncoding: TEncoding = Nil);
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
     property PrefixPostfix: Boolean read GetPrefixPostfix
@@ -95,11 +96,15 @@ constructor TBase85.Create(const _Alphabet: String = DefaultAlphabet;
 begin
 
   Inherited Create(85, _Alphabet, _Special, _textEncoding);
-  FHaveSpecial := False;
   PrefixPostfix := _prefixPostfix;
   BlockBitsCount := 32;
   BlockCharsCount := 5;
 
+end;
+
+function TBase85.GetHaveSpecial: Boolean;
+begin
+  result := False;
 end;
 
 function TBase85.GetPrefixPostfix: Boolean;
@@ -230,9 +235,9 @@ begin
 
     begin
 
-      Case AnsiIndexStr(c, ['z']) of
+      Case c of
 
-        0:
+        'z':
           begin
             if (count <> 0) then
             begin

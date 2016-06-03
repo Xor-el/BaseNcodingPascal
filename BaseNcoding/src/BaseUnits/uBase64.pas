@@ -67,6 +67,7 @@ type
       ; _parallel: Boolean = False
 {$ENDIF});
 
+    function GetHaveSpecial: Boolean; override;
     function Encode(data: TArray<Byte>): String; override;
     function Decode(const data: String): TArray<Byte>; override;
 
@@ -92,8 +93,12 @@ begin
   Inherited Create(64, _Alphabet, _Special,
     _textEncoding{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)},
     _parallel{$ENDIF});
-  FHaveSpecial := True;
 
+end;
+
+function TBase64.GetHaveSpecial: Boolean;
+begin
+  result := True;
 end;
 
 function TBase64.Encode(data: TArray<Byte>): String;

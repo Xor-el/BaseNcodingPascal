@@ -3792,8 +3792,6 @@ begin
 
 end;
 
-{$IFNDEF _FIXINSIGHT_}  // tells FixInsight to Ignore this Function
-
 class function TIntegerX.UIntPrecision(v: UInt32): UInt32;
 var
   i: UInt32;
@@ -3809,10 +3807,8 @@ begin
     end;
     Inc(i);
   end;
-
+  result := 0;
 end;
-
-{$ENDIF}
 
 class function TIntegerX.Add(x: TArray<UInt32>; y: TArray<UInt32>)
   : TArray<UInt32>;
