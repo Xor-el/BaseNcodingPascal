@@ -3,8 +3,6 @@ BaseNcodingDelphi
 
 **This is a Port of [BaseNcoding](https://github.com/KvanTTT/BaseNcoding) to Delphi.**
 
-**BaseNcodingDelphi** is a rewritten version of [DelphiBaseNcoding](https://github.com/Xor-el/DelphiBaseNcoding) (**Now Deprecated**) with a more "Object Oriented View" in mind.
-
 There are well-known algorithms for binary data to string encoding, such as algorithms with radix of power of 2 (base32, base64) and algorithms without power of 2 ([base85](http://en.wikipedia.org/wiki/Ascii85), [base91](http://sourceforge.net/projects/base91/)).
 
 This library implements algorithm for general case, that is, custom alphabet can be used (alphabet with custom length).
