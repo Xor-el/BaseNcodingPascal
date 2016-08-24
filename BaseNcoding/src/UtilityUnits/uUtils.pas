@@ -1,40 +1,51 @@
 unit uUtils;
 
+{$I ..\Include\BaseNcoding.inc}
+
 interface
 
 uses
 
+  uBaseNcodingTypes,
+{$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Math,
-  IntegerX;
+  System.Math;
+{$ELSE}
+SysUtils,
+  Math;
+{$ENDIF}
 
 type
+
   TUtils = class(TObject)
 
   public
 
-    class function CustomMatchStr(InChar: Char; const InString: String)
+    class function CustomMatchStr(InChar: TBaseNcodingChar;
+      const InString: TBaseNcodingString): Boolean; static;
+    class function IsNullOrEmpty(const InValue: TBaseNcodingString)
       : Boolean; static;
-    class function IsNullOrEmpty(const InValue: string): Boolean; static;
-    class function StartsWith(const InStringOne, InStringTwo: String)
+    class function StartsWith(const InStringOne, InStringTwo
+      : TBaseNcodingString): Boolean; static;
+    class function EndsWith(const InStringOne, InStringTwo: TBaseNcodingString)
       : Boolean; static;
-    class function EndsWith(const InStringOne, InStringTwo: String)
-      : Boolean; static;
-    class function RetreiveMax(const InString: String): Integer; static;
-    class function ArraytoString(const InArray: TArray<Char>): String; static;
+    class function RetreiveMax(const InString: TBaseNcodingString)
+      : Integer; static;
+    class function ArraytoString(const InArray: TBaseNcodingCharArray)
+      : TBaseNcodingString; static;
 
   end;
 
 implementation
 
-class function TUtils.CustomMatchStr(InChar: Char;
-  const InString: String): Boolean;
+class function TUtils.CustomMatchStr(InChar: TBaseNcodingChar;
+  const InString: TBaseNcodingString): Boolean;
 var
   i: Integer;
 
 begin
   result := False;
-  for i := Low(InString) to High(InString) do
+  for i := 1 to Length(InString) do
 
   begin
     if InString[i] = InChar then
@@ -46,7 +57,7 @@ begin
 
 end;
 
-class function TUtils.IsNullOrEmpty(const InValue: string): Boolean;
+class function TUtils.IsNullOrEmpty(const InValue: TBaseNcodingString): Boolean;
 
 const
   Empty = '';
@@ -56,20 +67,21 @@ begin
 end;
 
 class function TUtils.StartsWith(const InStringOne,
-  InStringTwo: String): Boolean;
+  InStringTwo: TBaseNcodingString): Boolean;
 var
-  tempStr: String;
+  tempStr: TBaseNcodingString;
 begin
 
-  tempStr := Copy(InStringOne, Low(InStringOne), 2);
+  tempStr := Copy(InStringOne, 1, 2);
 
   result := AnsiSameText(tempStr, InStringTwo);
 
 end;
 
-class function TUtils.EndsWith(const InStringOne, InStringTwo: String): Boolean;
+class function TUtils.EndsWith(const InStringOne,
+  InStringTwo: TBaseNcodingString): Boolean;
 var
-  tempStr: string;
+  tempStr: TBaseNcodingString;
 begin
 
   tempStr := Copy(InStringOne, Length(InStringOne) - 1, 2);
@@ -78,12 +90,12 @@ begin
 
 end;
 
-class function TUtils.RetreiveMax(const InString: String): Integer;
+class function TUtils.RetreiveMax(const InString: TBaseNcodingString): Integer;
 var
   i, MaxOrdinal, TempValue: Integer;
 begin
   MaxOrdinal := -1;
-  for i := Low(InString) to High(InString) do
+  for i := 1 to Length(InString) do
   begin
     TempValue := Ord(InString[i]);
     MaxOrdinal := Max(MaxOrdinal, TempValue);
@@ -96,11 +108,12 @@ begin
     result := MaxOrdinal;
 end;
 
-class function TUtils.ArraytoString(const InArray: TArray<Char>): String;
+class function TUtils.ArraytoString(const InArray: TBaseNcodingCharArray)
+  : TBaseNcodingString;
 
 begin
 
-  SetString(result, PChar(@InArray[0]), Length(InArray));
+  SetString(result, PBaseNcodingChar(@InArray[0]), Length(InArray));
 
 end;
 

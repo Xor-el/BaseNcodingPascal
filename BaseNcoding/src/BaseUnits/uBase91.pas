@@ -1,14 +1,28 @@
 unit uBase91;
 
-{$ZEROBASEDSTRINGS ON}
+{$I ..\Include\BaseNcoding.inc}
 
 interface
 
 uses
 
+  uBaseNcodingTypes,
+{$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
   System.Classes,
+{$ELSE}
+  SysUtils,
+  Classes,
+{$ENDIF}
+{$IFDEF FPC}
+  fgl,
+{$ELSE}
+{$IFDEF SCOPEDUNITNAMES}
   System.Generics.Collections,
+{$ELSE}
+  Generics.Collections,
+{$ENDIF}
+{$ENDIF}
   uBase,
   uUtils;
 
@@ -17,10 +31,10 @@ type
   IBase91 = interface
     ['{5BB3F4C5-0806-4E89-ACA0-84EDB0C8F959}']
 
-    function Encode(data: TArray<Byte>): String;
-    function Decode(const data: String): TArray<Byte>;
-    function EncodeString(const data: String): String;
-    function DecodeToString(const data: String): String;
+    function Encode(data: TBytes): TBaseNcodingString;
+    function Decode(const data: TBaseNcodingString): TBytes;
+    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
+    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
     function GetBitsPerChars: Double;
     property BitsPerChars: Double read GetBitsPerChars;
     function GetCharsCount: UInt32;
@@ -29,10 +43,10 @@ type
     property BlockBitsCount: Integer read GetBlockBitsCount;
     function GetBlockCharsCount: Integer;
     property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: String;
-    property Alphabet: String read GetAlphabet;
-    function GetSpecial: Char;
-    property Special: Char read GetSpecial;
+    function GetAlphabet: TBaseNcodingString;
+    property Alphabet: TBaseNcodingString read GetAlphabet;
+    function GetSpecial: TBaseNcodingChar;
+    property Special: TBaseNcodingChar read GetSpecial;
     function GetHaveSpecial: Boolean;
     property HaveSpecial: Boolean read GetHaveSpecial;
     function GetEncoding: TEncoding;
@@ -47,26 +61,36 @@ type
 
     const
 
-    DefaultAlphabet =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~"';
+    DefaultAlphabet: Array [0 .. 90] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
+      'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+      'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+      'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
+      'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '!', '#',
+      '$', '%', '&', '(', ')', '*', '+', ',', '.', '/', ':', ';', '<', '=', '>',
+      '?', '@', '[', ']', '^', '_', '`', '{', '|', '}', '~', '"');
 
-    DefaultSpecial = Char(0);
+    DefaultSpecial = TBaseNcodingChar(0);
 
-    constructor Create(const _Alphabet: String = DefaultAlphabet;
-      _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
+    constructor Create(_Alphabet: TBaseNcodingString = '';
+      _Special: TBaseNcodingChar = DefaultSpecial;
+      _textEncoding: TEncoding = Nil);
 
     function GetHaveSpecial: Boolean; override;
-    function Encode(data: TArray<Byte>): String; override;
-    function Decode(const data: String): TArray<Byte>; override;
+    function Encode(data: TBytes): TBaseNcodingString; override;
+    function Decode(const data: TBaseNcodingString): TBytes; override;
 
   end;
 
 implementation
 
-constructor TBase91.Create(const _Alphabet: String = DefaultAlphabet;
-  _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
+constructor TBase91.Create(_Alphabet: TBaseNcodingString = '';
+  _Special: TBaseNcodingChar = DefaultSpecial; _textEncoding: TEncoding = Nil);
 begin
-
+  if _Alphabet = '' then
+  begin
+    SetString(_Alphabet, PBaseNcodingChar(@DefaultAlphabet[0]),
+      Length(DefaultAlphabet));
+  end;
   Inherited Create(91, _Alphabet, _Special, _textEncoding);
   BlockBitsCount := 13;
   BlockCharsCount := 2;
@@ -78,10 +102,15 @@ begin
   result := False;
 end;
 
-function TBase91.Encode(data: TArray<Byte>): String;
+function TBase91.Encode(data: TBytes): TBaseNcodingString;
 var
   ebq, en, ev, i, dataLength: Integer;
+{$IFNDEF FPC}
   tempResult: TStringBuilder;
+{$ELSE}
+  tempResult: TFPGList<TBaseNcodingChar>;
+  uC: TBaseNcodingChar;
+{$ENDIF}
 begin
   if ((data = nil) or (Length(data) = 0)) then
   begin
@@ -90,14 +119,17 @@ begin
 
   dataLength := Length(data);
 
+{$IFDEF FPC}
+  tempResult := TFPGList<TBaseNcodingChar>.Create;
+{$ELSE}
   tempResult := TStringBuilder.Create(dataLength);
-
+{$ENDIF}
   try
     ebq := 0;
     en := 0;
     for i := 0 to Pred(dataLength) do
     begin
-      ebq := ebq or ((data[i] and 255) shl en);
+      ebq := ebq or ((Integer(data[i]) and 255) shl en);
       en := en + 8;
       if (en > 13) then
       begin
@@ -114,32 +146,63 @@ begin
           ebq := ebq shr 14;
           en := en - 14;
         end;
-        tempResult.Append(Alphabet[ev mod 91]);
-        tempResult.Append(Alphabet[ev div 91]);
+{$IFDEF FPC}
+        tempResult.Add(Alphabet[(ev mod 91) + 1]);
+        tempResult.Add(Alphabet[(ev div 91) + 1]);
 
+{$ELSE}
+        tempResult.Append(Alphabet[(ev mod 91) + 1]);
+        tempResult.Append(Alphabet[(ev div 91) + 1]);
+
+{$ENDIF}
       end
 
     end;
 
     if (en > 0) then
     begin
-      tempResult.Append(Alphabet[ebq mod 91]);
+{$IFDEF FPC}
+      tempResult.Add(Alphabet[(ebq mod 91) + 1]);
+
+{$ELSE}
+      tempResult.Append(Alphabet[(ebq mod 91) + 1]);
+
+{$ENDIF}
       if ((en > 7) or (ebq > 90)) then
 
       begin
-        tempResult.Append(Alphabet[ebq div 91]);
+{$IFDEF FPC}
+        tempResult.Add(Alphabet[(ebq div 91) + 1]);
+
+{$ELSE}
+        tempResult.Append(Alphabet[(ebq div 91) + 1]);
+
+{$ENDIF}
       end;
     end;
+{$IFDEF FPC}
+    result := '';
+    for uC in tempResult do
+    begin
+      result := result + uC;
+    end;
+{$ELSE}
     result := tempResult.ToString;
+{$ENDIF}
   finally
     tempResult.Free;
   end;
 end;
 
-function TBase91.Decode(const data: String): TArray<Byte>;
+function TBase91.Decode(const data: TBaseNcodingString): TBytes;
 var
-  dbq, dn, dv, i: Integer;
-  tempResult: TList<Byte>;
+  dbq, dn, dv, i, j: Integer;
+  b: Byte;
+{$IFDEF FPC}
+  tempResult: TFPGList<Byte>
+{$ELSE}
+  tempResult: TList<Byte>
+{$ENDIF};
 begin
 
   if TUtils.isNullOrEmpty(data) then
@@ -154,7 +217,11 @@ begin
   dn := 0;
   dv := -1;
 
+{$IFDEF FPC}
+  tempResult := TFPGList<Byte>.Create;
+{$ELSE}
   tempResult := TList<Byte>.Create;
+{$ENDIF};
   tempResult.Capacity := Length(data);
 
   try
@@ -162,16 +229,16 @@ begin
 
     begin
 
-      if (FInvAlphabet[Ord(data[i])] = -1) then
+      if (FInvAlphabet[Ord(data[(i) + 1])] = -1) then
         continue;
 
       if (dv = -1) then
-        dv := FInvAlphabet[Ord(data[i])]
+        dv := FInvAlphabet[Ord(data[(i) + 1])]
 
       else
       begin
 
-        dv := dv + FInvAlphabet[Ord(data[i])] * 91;
+        dv := dv + FInvAlphabet[Ord(data[(i) + 1])] * 91;
         dbq := dbq or dv shl dn;
 
         if (dv and 8191) > 88 then
@@ -199,7 +266,15 @@ begin
     begin
       tempResult.Add(Byte(dbq or dv shl dn));
     end;
-    result := tempResult.ToArray;
+
+    SetLength(result, tempResult.Count);
+    j := 0;
+    for b in tempResult do
+    begin
+      result[j] := b;
+      Inc(j);
+    end;
+
   finally
     tempResult.Free;
   end;

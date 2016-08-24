@@ -1,28 +1,30 @@
 unit uBase;
 
-{$ZEROBASEDSTRINGS ON}
-{$IF CompilerVersion >= 28}  // XE7 and Above
-{$DEFINE SUPPORT_PARALLEL_PROGRAMMING}
-{$ENDIF}
+{$I ..\Include\BaseNcoding.inc}
 
 interface
 
 uses
-
+{$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
   System.Math,
+{$ELSE}
+  SysUtils,
+  Math,
+{$ENDIF}
   IntegerX,
-  uUtils;
+  uUtils,
+  uBaseNcodingTypes;
 
 type
 
   IBase = interface
     ['{105A4B0A-69E8-41D1-9954-5D1CED996326}']
 
-    function Encode(data: TArray<Byte>): String;
-    function Decode(const data: String): TArray<Byte>;
-    function EncodeString(const data: String): String;
-    function DecodeToString(const data: String): String;
+    function Encode(data: TBytes): TBaseNcodingString;
+    function Decode(const data: TBaseNcodingString): TBytes;
+    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
+    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
     function GetBitsPerChars: Double;
     property BitsPerChars: Double read GetBitsPerChars;
     function GetCharsCount: UInt32;
@@ -31,16 +33,16 @@ type
     property BlockBitsCount: Integer read GetBlockBitsCount;
     function GetBlockCharsCount: Integer;
     property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: String;
-    property Alphabet: String read GetAlphabet;
-    function GetSpecial: Char;
-    property Special: Char read GetSpecial;
+    function GetAlphabet: TBaseNcodingString;
+    property Alphabet: TBaseNcodingString read GetAlphabet;
+    function GetSpecial: TBaseNcodingChar;
+    property Special: TBaseNcodingChar read GetSpecial;
     function GetHaveSpecial: Boolean;
     property HaveSpecial: Boolean read GetHaveSpecial;
     function GetEncoding: TEncoding;
     procedure SetEncoding(value: TEncoding);
     property Encoding: TEncoding read GetEncoding write SetEncoding;
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     function GetParallel: Boolean;
     procedure SetParallel(value: Boolean);
     property Parallel: Boolean read GetParallel write SetParallel;
@@ -49,7 +51,7 @@ type
 
   TBase = class abstract(TInterfacedObject, IBase)
 
-  strict private
+  protected
 
     function GetBitsPerChars: Double;
     function GetCharsCount: UInt32;
@@ -58,40 +60,42 @@ type
     procedure SetBlockBitsCount(value: Integer);
     function GetBlockCharsCount: Integer;
     procedure SetBlockCharsCount(value: Integer);
-    function GetAlphabet: String;
-    procedure SetAlphabet(const value: String);
-    function GetSpecial: Char;
-    procedure SetSpecial(value: Char);
+    function GetAlphabet: TBaseNcodingString;
+    procedure SetAlphabet(const value: TBaseNcodingString);
+    function GetSpecial: TBaseNcodingChar;
+    procedure SetSpecial(value: TBaseNcodingChar);
+    function GetHaveSpecial: Boolean; virtual; abstract;
     function GetEncoding: TEncoding;
     procedure SetEncoding(value: TEncoding);
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     function GetParallel: Boolean;
     procedure SetParallel(value: Boolean);
 {$ENDIF}
   protected
 
-  class var
+    // class var
     FCharsCount: UInt32;
     FBlockBitsCount, FBlockCharsCount: Integer;
-    FAlphabet: String;
-    FSpecial: Char;
+    FAlphabet: TBaseNcodingString;
+    FSpecial: TBaseNcodingChar;
     FHaveSpecial: Boolean;
     FEncoding: TEncoding;
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     FParallel: Boolean;
 {$ENDIF}
   public
 
-    constructor Create(_charsCount: LongWord; const _alphabet: String;
-      const _special: Char;
-      _encoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+    constructor Create(_charsCount: LongWord;
+      const _alphabet: TBaseNcodingString; const _special: TBaseNcodingChar;
+      _encoding: TEncoding = Nil{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
       ; _parallel: Boolean = False
 {$ENDIF});
-    function GetHaveSpecial: Boolean; virtual; abstract;
-    function EncodeString(const data: String): String; virtual;
-    function Encode(data: TArray<Byte>): String; virtual; abstract;
-    function DecodeToString(const data: String): String; virtual;
-    function Decode(const data: String): TArray<Byte>; virtual; abstract;
+    function EncodeString(const data: TBaseNcodingString)
+      : TBaseNcodingString; virtual;
+    function Encode(data: TBytes): TBaseNcodingString; virtual; abstract;
+    function DecodeToString(const data: TBaseNcodingString)
+      : TBaseNcodingString; virtual;
+    function Decode(const data: TBaseNcodingString): TBytes; virtual; abstract;
 
     /// <summary>
     /// From: http://stackoverflow.com/a/600306/1046374
@@ -121,29 +125,30 @@ type
       base2BitsCount: Boolean = False): Integer; static;
 
     property BitsPerChars: Double read GetBitsPerChars;
-    property CharsCount: UInt32 read GetCharsCount write SetCharsCount;
+    property CharsCount: UInt32 read GetCharsCount
+      write SetCharsCount;
     property BlockBitsCount: Integer read GetBlockBitsCount
       write SetBlockBitsCount;
     property BlockCharsCount: Integer read GetBlockCharsCount
       write SetBlockCharsCount;
-    property Alphabet: String read GetAlphabet write SetAlphabet;
-    property Special: Char read GetSpecial write SetSpecial;
+    property Alphabet: TBaseNcodingString read GetAlphabet write SetAlphabet;
+    property Special: TBaseNcodingChar read GetSpecial write SetSpecial;
     property HaveSpecial: Boolean read GetHaveSpecial;
     property Encoding: TEncoding read GetEncoding write SetEncoding;
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     property Parallel: Boolean read GetParallel write SetParallel;
 {$ENDIF}
   protected
 
-    FInvAlphabet: TArray<Integer>;
+    FInvAlphabet: TBaseNcodingIntegerArray;
 
   end;
 
 implementation
 
-constructor TBase.Create(_charsCount: LongWord; const _alphabet: String;
-  const _special: Char;
-  _encoding: TEncoding = Nil{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+constructor TBase.Create(_charsCount: LongWord;
+  const _alphabet: TBaseNcodingString; const _special: TBaseNcodingChar;
+  _encoding: TEncoding = Nil{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
   ; _parallel: Boolean = False
 {$ENDIF});
 var
@@ -156,9 +161,9 @@ begin
     raise EArgumentException.Create
       (Format('Base string should contain %u chars', [_charsCount]));
 
-  for i := 0 to Pred(_charsCount) do
+  for i := 1 to _charsCount do
   begin
-    for j := Succ(i) to Pred(_charsCount) do
+    for j := Succ(i) to _charsCount do
     begin
       if (_alphabet[i] = _alphabet[j]) then
         raise EArgumentException.Create
@@ -187,9 +192,9 @@ begin
     FInvAlphabet[i] := -1;
   end;
 
-  for i := 0 to Pred(_charsCount) do
+  for i := 1 to _charsCount do
   begin
-    FInvAlphabet[Ord(Alphabet[i])] := i;
+    FInvAlphabet[Ord(Alphabet[i])] := i - 1;
   end;
 
   if _encoding <> Nil then
@@ -197,7 +202,7 @@ begin
   else
     Encoding := TEncoding.UTF8;
 
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
   Parallel := _parallel;
 {$ENDIF}
 end;
@@ -240,22 +245,22 @@ begin
   FBlockCharsCount := value;
 end;
 
-function TBase.GetAlphabet: String;
+function TBase.GetAlphabet: TBaseNcodingString;
 begin
   result := FAlphabet;
 end;
 
-procedure TBase.SetAlphabet(const value: String);
+procedure TBase.SetAlphabet(const value: TBaseNcodingString);
 begin
   FAlphabet := value;
 end;
 
-function TBase.GetSpecial: Char;
+function TBase.GetSpecial: TBaseNcodingChar;
 begin
   result := FSpecial;
 end;
 
-procedure TBase.SetSpecial(value: Char);
+procedure TBase.SetSpecial(value: TBaseNcodingChar);
 begin
   FSpecial := value;
 end;
@@ -270,7 +275,7 @@ begin
   FEncoding := value;
 end;
 
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
 
 function TBase.GetParallel: Boolean;
 begin
@@ -284,13 +289,14 @@ end;
 
 {$ENDIF}
 
-function TBase.EncodeString(const data: String): String;
+function TBase.EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
 
 begin
   result := Encode(Encoding.GetBytes(data));
 end;
 
-function TBase.DecodeToString(const data: String): String;
+function TBase.DecodeToString(const data: TBaseNcodingString)
+  : TBaseNcodingString;
 begin
   result := Encoding.GetString(Decode(StringReplace(data, sLineBreak, '',
     [rfReplaceAll])));

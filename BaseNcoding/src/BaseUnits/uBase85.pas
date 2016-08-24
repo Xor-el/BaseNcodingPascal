@@ -1,26 +1,33 @@
 unit uBase85;
 
-{$ZEROBASEDSTRINGS ON}
+{$I ..\Include\BaseNcoding.inc}
 
 interface
 
 uses
-
+  uBaseNcodingTypes,
+{$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
   System.Classes,
-  System.StrUtils,
+{$ELSE}
+  SysUtils,
+  Classes,
+{$ENDIF}
   uBase,
-  uUtils;
+  uUtils
+{$IFDEF FPC}
+    , fgl
+{$ENDIF};
 
 type
 
   IBase85 = interface
     ['{A230687D-2037-482C-B207-E543683B5ED4}']
 
-    function Encode(data: TArray<Byte>): String;
-    function Decode(const data: String): TArray<Byte>;
-    function EncodeString(const data: String): String;
-    function DecodeToString(const data: String): String;
+    function Encode(data: TBytes): TBaseNcodingString;
+    function Decode(const data: TBaseNcodingString): TBytes;
+    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
+    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
     function GetBitsPerChars: Double;
     property BitsPerChars: Double read GetBitsPerChars;
     function GetCharsCount: UInt32;
@@ -29,10 +36,10 @@ type
     property BlockBitsCount: Integer read GetBlockBitsCount;
     function GetBlockCharsCount: Integer;
     property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: String;
-    property Alphabet: String read GetAlphabet;
-    function GetSpecial: Char;
-    property Special: Char read GetSpecial;
+    function GetAlphabet: TBaseNcodingString;
+    property Alphabet: TBaseNcodingString read GetAlphabet;
+    function GetSpecial: TBaseNcodingChar;
+    property Special: TBaseNcodingChar read GetSpecial;
     function GetHaveSpecial: Boolean;
     property HaveSpecial: Boolean read GetHaveSpecial;
     function GetEncoding: TEncoding;
@@ -47,42 +54,51 @@ type
 
   TBase85 = class(TBase, IBase85)
 
-  strict private
+  protected
 
     function GetPrefixPostfix: Boolean;
     procedure SetPrefixPostfix(value: Boolean);
-    procedure EncodeBlock(count: Integer; sb: TStringBuilder;
-      encodedBlock: TArray<Byte>; tuple: UInt32);
-    procedure DecodeBlock(bytes: Integer; decodedBlock: TArray<Byte>;
-      tuple: UInt32);
+
+  strict private
+
+    procedure EncodeBlock(count: Integer; var sb:
+{$IFDEF FPC} TFPGList<TBaseNcodingString>
+{$ELSE} TStringBuilder
+{$ENDIF}; encodedBlock: TBytes; tuple: UInt32);
+    procedure DecodeBlock(bytes: Integer; decodedBlock: TBytes; tuple: UInt32);
 
   protected
 
-    class var
+    // class var
 
-      FPrefixPostfix: Boolean;
+    FPrefixPostfix: Boolean;
 
   public
 
     const
 
-    DefaultAlphabet =
-      '!"#$%&''()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstu';
+    DefaultAlphabet: Array [0 .. 84] of TBaseNcodingChar = ('!', '"', '#', '$',
+      '%', '&', '''', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2',
+      '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A',
+      'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+      'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\', ']', '^', '_',
+      '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+      'o', 'p', 'q', 'r', 's', 't', 'u');
 
-    DefaultSpecial = Char(0);
+    DefaultSpecial = TBaseNcodingChar(0);
     Pow85: Array [0 .. 4] of UInt32 = (85 * 85 * 85 * 85, 85 * 85 * 85,
       85 * 85, 85, 1);
 
     Prefix = '<~';
     Postfix = '~>';
 
-    constructor Create(const _Alphabet: String = DefaultAlphabet;
-      _Special: Char = DefaultSpecial; _prefixPostfix: Boolean = False;
-      _textEncoding: TEncoding = Nil);
+    constructor Create(_Alphabet: TBaseNcodingString = '';
+      _Special: TBaseNcodingChar = DefaultSpecial;
+      _prefixPostfix: Boolean = False; _textEncoding: TEncoding = Nil);
 
     function GetHaveSpecial: Boolean; override;
-    function Encode(data: TArray<Byte>): String; override;
-    function Decode(const data: String): TArray<Byte>; override;
+    function Encode(data: TBytes): TBaseNcodingString; override;
+    function Decode(const data: TBaseNcodingString): TBytes; override;
     property PrefixPostfix: Boolean read GetPrefixPostfix
       write SetPrefixPostfix;
 
@@ -90,11 +106,15 @@ type
 
 implementation
 
-constructor TBase85.Create(const _Alphabet: String = DefaultAlphabet;
-  _Special: Char = DefaultSpecial; _prefixPostfix: Boolean = False;
+constructor TBase85.Create(_Alphabet: TBaseNcodingString = '';
+  _Special: TBaseNcodingChar = DefaultSpecial; _prefixPostfix: Boolean = False;
   _textEncoding: TEncoding = Nil);
 begin
-
+  if _Alphabet = '' then
+  begin
+    SetString(_Alphabet, PBaseNcodingChar(@DefaultAlphabet[0]),
+      Length(DefaultAlphabet));
+  end;
   Inherited Create(85, _Alphabet, _Special, _textEncoding);
   PrefixPostfix := _prefixPostfix;
   BlockBitsCount := 32;
@@ -119,12 +139,17 @@ end;
 
 {$OVERFLOWCHECKS OFF}
 
-function TBase85.Encode(data: TArray<Byte>): String;
+function TBase85.Encode(data: TBytes): TBaseNcodingString;
 
 var
-  encodedBlock: TArray<Byte>;
+  encodedBlock: TBytes;
   decodedBlockLength, count, resultLength: Integer;
+{$IFNDEF FPC}
   sb: TStringBuilder;
+{$ELSE}
+  sb: TFPGList<TBaseNcodingString>;
+  uS: TBaseNcodingString;
+{$ENDIF}
   tuple: UInt32;
   b: Byte;
   temp: Double;
@@ -137,12 +162,20 @@ begin
   if (PrefixPostfix) then
     resultLength := resultLength + Length(Prefix) + Length(Postfix);
 
+{$IFDEF FPC}
+  sb := TFPGList<TBaseNcodingString>.Create;
+  sb.Capacity := resultLength;
+{$ELSE}
   sb := TStringBuilder.Create(resultLength);
-
+{$ENDIF}
   try
     if (PrefixPostfix) then
     begin
+{$IFDEF FPC}
+      sb.Add(Prefix);
+{$ELSE}
       sb.Append(Prefix);
+{$ENDIF}
     end;
     count := 0;
     tuple := 0;
@@ -153,7 +186,11 @@ begin
         tuple := tuple or b;
         if (tuple = 0) then
         begin
+{$IFDEF FPC}
+          sb.Add('z')
+{$ELSE}
           sb.Append('z')
+{$ENDIF}
         end
         else
         begin
@@ -178,9 +215,21 @@ begin
     end;
     if (PrefixPostfix) then
     begin
+{$IFDEF FPC}
+      sb.Add(Postfix);
+{$ELSE}
       sb.Append(Postfix);
+{$ENDIF}
     end;
+{$IFDEF FPC}
+    result := '';
+    for uS in sb do
+    begin
+      result := result + uS;
+    end;
+{$ELSE}
     result := sb.ToString;
+{$ENDIF}
   finally
     sb.Free;
   end;
@@ -189,15 +238,15 @@ end;
 
 {$OVERFLOWCHECKS OFF}
 
-function TBase85.Decode(const data: String): TArray<Byte>;
+function TBase85.Decode(const data: TBaseNcodingString): TBytes;
 var
-  dataWithoutPrefixPostfix: String;
+  dataWithoutPrefixPostfix: TBaseNcodingString;
   ms: TMemoryStream;
-  count, encodedBlockLength, i: Integer;
+  count, encodedBlockLength, i, Idx: Integer;
   processChar: Boolean;
   tuple: LongWord;
-  decodedBlock: TArray<Byte>;
-  c: Char;
+  decodedBlock: TBytes;
+  c: TBaseNcodingChar;
 
 begin
 
@@ -231,9 +280,16 @@ begin
     tuple := UInt32(0);
     encodedBlockLength := 5;
     SetLength(decodedBlock, 4);
-    for c in dataWithoutPrefixPostfix do
+
+    // NOTE to Self and other Developers who care to poke at the Source.
+    // "for in loop" for "strings" in FPC 3.0 and Lazarus 1.6 is broken
+    // if "{$ZEROBASEDSTRINGS ON}" is enabled so I decided to use the
+    // "good old fashioned" "for" loop because who knows, something else might be broken :)
+
+    for Idx := 1 to Length(dataWithoutPrefixPostfix) do
 
     begin
+      c := dataWithoutPrefixPostfix[Idx];
 
       Case c of
 
@@ -249,7 +305,8 @@ begin
             decodedBlock[2] := 0;
             decodedBlock[3] := 0;
 
-            ms.Write(decodedBlock, 0, Length(decodedBlock));
+            ms.Write(decodedBlock[0], Length(decodedBlock));
+
             processChar := False;
           end
 
@@ -266,7 +323,9 @@ begin
         if (count = encodedBlockLength) then
         begin
           DecodeBlock(Length(decodedBlock), decodedBlock, tuple);
-          ms.Write(decodedBlock, 0, Length(decodedBlock));
+
+          ms.Write(decodedBlock[0], Length(decodedBlock));
+
           tuple := 0;
           count := 0;
         end;
@@ -303,8 +362,10 @@ end;
 
 {$OVERFLOWCHECKS OFF}
 
-procedure TBase85.EncodeBlock(count: Integer; sb: TStringBuilder;
-  encodedBlock: TArray<Byte>; tuple: UInt32);
+procedure TBase85.EncodeBlock(count: Integer; var sb:
+{$IFDEF FPC} TFPGList<TBaseNcodingString>
+{$ELSE} TStringBuilder
+{$ENDIF}; encodedBlock: TBytes; tuple: UInt32);
 var
   i: Integer;
 
@@ -324,13 +385,17 @@ begin
 
   while i < count do
   begin
-    sb.Append(Alphabet[encodedBlock[i]]);
+{$IFDEF FPC}
+    sb.Add(Alphabet[(encodedBlock[i]) + 1]);
+{$ELSE}
+    sb.Append(Alphabet[(encodedBlock[i]) + 1]);
+{$ENDIF}
     Inc(i);
   end;
 
 end;
 
-procedure TBase85.DecodeBlock(bytes: Integer; decodedBlock: TArray<Byte>;
+procedure TBase85.DecodeBlock(bytes: Integer; decodedBlock: TBytes;
   tuple: LongWord);
 var
   i: Integer;

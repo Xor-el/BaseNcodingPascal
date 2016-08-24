@@ -1,0 +1,53 @@
+package BaseNcodingPascalPackage;
+
+{$WARNINGS OFF}
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS OFF}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE RELEASE}
+{$ENDIF IMPLICITBUILDING}
+{$RUNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  soaprtl;
+
+contains
+  uBase in '..\..\BaseUnits\uBase.pas',
+  uBase32 in '..\..\BaseUnits\uBase32.pas',
+  uBase64 in '..\..\BaseUnits\uBase64.pas',
+  uBase85 in '..\..\BaseUnits\uBase85.pas',
+  uBase91 in '..\..\BaseUnits\uBase91.pas',
+  uBase128 in '..\..\BaseUnits\uBase128.pas',
+  uBase256 in '..\..\BaseUnits\uBase256.pas',
+  uBase1024 in '..\..\BaseUnits\uBase1024.pas',
+  uBase4096 in '..\..\BaseUnits\uBase4096.pas',
+  uBaseBigN in '..\..\BaseUnits\uBaseBigN.pas',
+  uBaseN in '..\..\BaseUnits\uBaseN.pas',
+  uZBase32 in '..\..\BaseUnits\uZBase32.pas',
+  IntegerX in '..\..\UtilityUnits\IntegerX.pas',
+  uBaseNcodingTypes in '..\..\UtilityUnits\uBaseNcodingTypes.pas',
+  uUtils in '..\..\UtilityUnits\uUtils.pas';
+
+end.

@@ -1,11 +1,46 @@
 unit IntegerX;
 
+{$I ..\Include\BaseNcoding.inc}
+
 interface
 
 uses
-  System.SysUtils, System.Math, System.Generics.Collections;
+{$IFDEF SCOPEDUNITNAMES}
+  System.SysUtils,
+  System.Math,
+{$ELSE}
+  SysUtils,
+  Math,
+{$ENDIF}
+{$IFDEF FPC}
+  fgl
+{$ELSE}
+{$IFDEF SCOPEDUNITNAMES}
+  System.Generics.Collections
+{$ELSE}
+  Generics.Collections
+{$ENDIF}
+{$ENDIF};
 
 type
+
+  /// <summary>
+  /// alias for "char" type depending on the compiler.
+  /// </summary>
+  TIntegerXChar = {$IFDEF FPC} UnicodeChar {$ELSE} Char {$ENDIF};
+  /// <summary>
+  /// Represents a dynamic array of Char.
+  /// </summary>
+  TIntegerXCharArray = array of TIntegerXChar;
+  /// <summary>
+  /// Represents a dynamic array of Integer.
+  /// </summary>
+  TIntegerXIntegerArray = array of Integer;
+  /// <summary>
+  /// Represents a dynamic array of UInt32.
+  /// </summary>
+  TIntegerXUInt32Array = array of UInt32;
+
   /// <summary>
   /// Extended Precision Integer.
   /// </summary>
@@ -38,7 +73,7 @@ type
     /// These invariants imply a unique representation for every value.
     /// They also force us to get rid of leading zeros after every operation that might create some.
     /// </remarks>
-    _data: TArray<UInt32>;
+    _data: TIntegerXUInt32Array;
 
     /// <summary>
     /// Getter function for <see cref="TIntegerX.Precision" />
@@ -71,18 +106,19 @@ type
     class function GetNegativeOne: TIntegerX; static;
 
     /// <summary>
-    /// Append a sequence of digits representing <paramref name="rem"/> to the <see cref="TStringBuilder"/>,
+    /// Append a sequence of digits representing <paramref name="rem"/> to the <see cref="StringBuilder"/> or <see cref="String"/>,
     /// possibly adding leading null chars if specified.
     /// </summary>
-    /// <param name="sb">The <see cref="TStringBuilder"/> to append characters to</param>
+    /// <param name="sb">The <see cref="StringBuilder"/> or <see cref="String"/> to append characters to</param>
     /// <param name="rem">The 'super digit' value to be converted to its string representation</param>
     /// <param name="radix">The radix for the conversion</param>
     /// <param name="charBuf">A character buffer used for temporary storage, big enough to hold the string
     /// representation of <paramref name="rem"/></param>
     /// <param name="leadingZeros">Whether or not to pad with the leading zeros if the value is not large enough to fill the buffer</param>
     /// <remarks>Pretty much identical to DLR BigInteger.AppendRadix</remarks>
-    class procedure AppendDigit(var sb: TStringBuilder; rem: UInt32;
-      radix: UInt32; charBuf: TArray<Char>; leadingZeros: Boolean); static;
+    class procedure AppendDigit(var sb:
+{$IFDEF FPC} String{$ELSE} TStringBuilder{$ENDIF}; rem: UInt32; radix: UInt32;
+      var charBuf: TIntegerXCharArray; leadingZeros: Boolean); static;
     /// <summary>
     /// Convert an (extended) digit to its value in the given radix.
     /// </summary>
@@ -98,8 +134,8 @@ type
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns><value>-1</value> if the first is less than second; <value>0</value> if equal; <value>+1</value> if greater</returns>
-    class function Compare(x: TArray<UInt32>; y: TArray<UInt32>): SmallInt;
-      overload; static;
+    class function Compare(x: TIntegerXUInt32Array; y: TIntegerXUInt32Array)
+      : SmallInt; overload; static;
 
     /// <summary>
     /// Compute the greatest common divisor of two <see cref="TIntegerX"/> values.
@@ -194,40 +230,40 @@ type
     /// </summary>
     /// <param name="a"></param>
     /// <returns></returns>
-    class function MakeTwosComplement(a: TArray<UInt32>)
-      : TArray<UInt32>; static;
+    class function MakeTwosComplement(a: TIntegerXUInt32Array)
+      : TIntegerXUInt32Array; static;
     /// <summary>
     /// Add two UInt32 arrays (big-endian).
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    class function Add(x: TArray<UInt32>; y: TArray<UInt32>): TArray<UInt32>;
-      overload; static;
+    class function Add(x: TIntegerXUInt32Array; y: TIntegerXUInt32Array)
+      : TIntegerXUInt32Array; overload; static;
     /// <summary>
     /// Add one digit.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="newDigit"></param>
     /// <returns></returns>
-    class function AddSignificantDigit(x: TArray<UInt32>; newDigit: UInt32)
-      : TArray<UInt32>; overload; static;
+    class function AddSignificantDigit(x: TIntegerXUInt32Array;
+      newDigit: UInt32): TIntegerXUInt32Array; overload; static;
     /// <summary>
     /// Subtract one instance from another (larger first).
     /// </summary>
     /// <param name="xs"></param>
     /// <param name="ys"></param>
     /// <returns></returns>
-    class function Subtract(xs: TArray<UInt32>; ys: TArray<UInt32>)
-      : TArray<UInt32>; overload; static;
+    class function Subtract(xs: TIntegerXUInt32Array; ys: TIntegerXUInt32Array)
+      : TIntegerXUInt32Array; overload; static;
     /// <summary>
     /// Multiply two big-endian UInt32 arrays.
     /// </summary>
     /// <param name="xs"></param>
     /// <param name="ys"></param>
     /// <returns></returns>
-    class function Multiply(xs: TArray<UInt32>; ys: TArray<UInt32>)
-      : TArray<UInt32>; overload; static;
+    class function Multiply(xs: TIntegerXUInt32Array; ys: TIntegerXUInt32Array)
+      : TIntegerXUInt32Array; overload; static;
     /// <summary>
     /// Return the quotient and remainder of dividing one <see cref="TIntegerX"/> by another.
     /// </summary>
@@ -236,8 +272,9 @@ type
     /// <param name="q">Set to the quotient</param>
     /// <param name="r">Set to the remainder</param>
     /// <remarks>Algorithm D in Knuth 4.3.1.</remarks>
-    class procedure DivMod(x: TArray<UInt32>; y: TArray<UInt32>;
-      out q: TArray<UInt32>; out r: TArray<UInt32>); overload; static;
+    class procedure DivMod(x: TIntegerXUInt32Array; y: TIntegerXUInt32Array;
+      out q: TIntegerXUInt32Array; out r: TIntegerXUInt32Array);
+      overload; static;
 
     /// <summary>
     ///
@@ -245,8 +282,8 @@ type
     /// <param name="xnorm"></param>
     /// <param name="r"></param>
     /// <param name="shift"></param>
-    class procedure Unnormalize(xnorm: TArray<UInt32>; out r: TArray<UInt32>;
-      shift: Integer); static;
+    class procedure Unnormalize(xnorm: TIntegerXUInt32Array;
+      out r: TIntegerXUInt32Array; shift: Integer); static;
 
     /// <summary>
     /// Do a multiplication and addition in place.
@@ -255,19 +292,19 @@ type
     /// <param name="mult">The value to multiply by</param>
     /// <param name="addend">The value to add in</param>
 
-    class procedure InPlaceMulAdd(var data: TArray<UInt32>; mult: UInt32;
+    class procedure InPlaceMulAdd(var data: TIntegerXUInt32Array; mult: UInt32;
       addend: UInt32); static;
     /// <summary>
     /// Return a (possibly new) UInt32 array with leading zero uints removed.
     /// </summary>
     /// <param name="data">The UInt32 array to prune</param>
     /// <returns>A (possibly new) UInt32 array with leading zero UInt32's removed.</returns>
-    class function RemoveLeadingZeros(data: TArray<UInt32>)
-      : TArray<UInt32>; static;
+    class function RemoveLeadingZeros(data: TIntegerXUInt32Array)
+      : TIntegerXUInt32Array; static;
 
-    class function StripLeadingZeroBytes(a: TArray<Byte>)
-      : TArray<UInt32>; static;
-    class function makePositive(a: TArray<Byte>): TArray<UInt32>; static;
+    class function StripLeadingZeroBytes(a: TBytes)
+      : TIntegerXUInt32Array; static;
+    class function makePositive(a: TBytes): TIntegerXUInt32Array; static;
 
     /// <summary>
     /// Do a division in place and return the remainder.
@@ -278,8 +315,8 @@ type
     /// <returns>The remainder</returns>
     /// <remarks>Pretty much identical to DLR BigInteger.div, except DLR's is little-endian
     /// and this is big-endian.</remarks>
-    class function InPlaceDivRem(var data: TArray<UInt32>; var index: Integer;
-      divisor: UInt32): UInt32; static;
+    class function InPlaceDivRem(var data: TIntegerXUInt32Array;
+      var index: Integer; divisor: UInt32): UInt32; static;
     /// <summary>
     /// Divide a big-endian UInt32 array by a UInt32 divisor, returning the quotient and remainder.
     /// </summary>
@@ -287,8 +324,8 @@ type
     /// <param name="divisor">The value to divide by</param>
     /// <param name="quotient">Set to the quotient (newly allocated)</param>
     /// <returns>The remainder</returns>
-    class function CopyDivRem(data: TArray<UInt32>; divisor: UInt32;
-      out quotient: TArray<UInt32>): UInt32; static;
+    class function CopyDivRem(data: TIntegerXUInt32Array; divisor: UInt32;
+      out quotient: TIntegerXUInt32Array): UInt32; static;
 
     function signInt(): Integer;
 
@@ -361,7 +398,7 @@ type
     /// <summary>
     /// FUIntLogTable.
     /// </summary>
-    FUIntLogTable: TArray<UInt32>;
+    FUIntLogTable: TIntegerXUInt32Array;
 
     /// <summary>
     /// The maximum number of digits in radix[i] that will fit into a UInt32.
@@ -369,7 +406,7 @@ type
     /// <remarks>
     /// <para>FRadixDigitsPerDigit[i] = floor(log_i (2^32 - 1))</para>
     /// </remarks>
-    FRadixDigitsPerDigit: TArray<Integer>;
+    FRadixDigitsPerDigit: TIntegerXIntegerArray;
 
     /// <summary>
     /// The super radix (power of given radix) that fits into a UInt32.
@@ -377,7 +414,7 @@ type
     /// <remarks>
     /// <para>FSuperRadix[i] = 2 ^ FRadixDigitsPerDigit[i]</para>
     /// </remarks>
-    FSuperRadix: TArray<UInt32>;
+    FSuperRadix: TIntegerXUInt32Array;
 
     /// <summary>
     /// The number of bits in one digit of radix[i] times 1024.
@@ -386,14 +423,23 @@ type
     /// <para>FBitsPerRadixDigit[i] = ceiling(1024*log_2(i))</para>
     /// <para>The value is multiplied by 1024 to avoid fractions.  Users will need to divide by 1024.</para>
     /// </remarks>
-    FBitsPerRadixDigit: TArray<Integer>;
+    FBitsPerRadixDigit: TIntegerXIntegerArray;
 
     /// <summary>
     /// The value at index i is the number of trailing zero bits in the value i.
     /// </summary>
-    FTrailingZerosTable: TArray<Byte>;
+    FTrailingZerosTable: TBytes;
 
-    class constructor Create();
+    /// <summary>
+    /// Since Delphi 2009 does not support Static class constructors, I decided to use a normal method
+    /// and call it on the initialization section of the unit.
+    /// </summary>
+
+  private
+
+    class procedure CreateIntegerXState(); static;
+
+  strict private
 
   public
     /// <summary>
@@ -525,20 +571,20 @@ type
     /// </summary>
     /// <param name="v">A byte-array representation of a double</param>
     /// <returns>The sign bit, either 0 (positive) or 1 (negative)</returns>
-    class function GetDoubleSign(v: TArray<Byte>): Integer; static;
+    class function GetDoubleSign(v: TBytes): Integer; static;
     /// <summary>
     /// Extract the significand (AKA mantissa, coefficient) from a byte-array representation of a double.
     /// </summary>
     /// <param name="v">A byte-array representation of a double</param>
     /// <returns>The significand</returns>
-    class function GetDoubleSignificand(v: TArray<Byte>): UInt64; static;
+    class function GetDoubleSignificand(v: TBytes): UInt64; static;
 
     /// <summary>
     /// Extract the exponent from a byte-array representation of a double.
     /// </summary>
     /// <param name="v">A byte-array representation of a double</param>
     /// <returns>The exponent</returns>
-    class function GetDoubleBiasedExponent(v: TArray<Byte>): Word; static;
+    class function GetDoubleBiasedExponent(v: TBytes): Word; static;
     /// <summary>
     /// Algorithm from Hacker's Delight, section 11-4. for internal use only
     /// </summary>
@@ -558,8 +604,8 @@ type
     /// <para>Assume shift in [0,31]</para>
     /// <para>This should be private, but I wanted to test it.</para>
     /// </remarks>
-    class procedure Normalize(var xnorm: TArray<UInt32>; xnlen: Integer;
-      x: TArray<UInt32>; xlen: Integer; shift: Integer); static;
+    class procedure Normalize(var xnorm: TIntegerXUInt32Array; xnlen: Integer;
+      x: TIntegerXUInt32Array; xlen: Integer; shift: Integer); static;
     /// <summary>
     /// Implicitly convert from Byte to <see cref="TIntegerX"/>.
     /// </summary>
@@ -1325,13 +1371,13 @@ type
     /// </summary>
     /// <returns>The magnitude</returns>
     /// <remarks>The returned array can be manipulated as you like = unshared.</remarks>
-    function GetMagnitude(): TArray<UInt32>;
+    function GetMagnitude(): TIntegerXUInt32Array;
 
     function BitLength(): UInt32;
 
     function BitCount(): UInt32; overload;
 
-    function ToByteArray(): TArray<Byte>;
+    function ToByteArray(): TBytes;
 
     /// <summary>
     /// Creates a copy of a <see cref="TIntegerX"/>.
@@ -1339,7 +1385,7 @@ type
     /// <param name="copy">The <see cref="TIntegerX"/> to copy.</param>
     constructor Create(copy: TIntegerX); overload;
 
-    constructor Create(val: TArray<Byte>); overload;
+    constructor Create(val: TBytes); overload;
     /// <summary>
     /// Creates a <see cref="TIntegerX"/> from sign/magnitude data.
     /// </summary>
@@ -1351,7 +1397,7 @@ type
     /// <para>Leading zero (UInt32) digits will be removed.</para>
     /// <para>The sign will be set to zero if a zero-length array is passed.</para>
     /// </remarks>
-    constructor Create(Sign: Integer; data: TArray<UInt32>); overload;
+    constructor Create(Sign: Integer; data: TIntegerXUInt32Array); overload;
 
     class var
     /// <summary>
@@ -1363,7 +1409,7 @@ type
 
   EArithmeticException = EMathError;
   EOverflowException = EOverflow;
-  EInvalidOperationException = EInvalidOpException;
+  EInvalidOperationException = EInvalidOp;
   EDivByZeroException = EDivByZero;
   EFormatException = class(Exception);
 
@@ -1417,53 +1463,61 @@ resourcestring
 
 implementation
 
-class constructor TIntegerX.Create();
+class procedure TIntegerX.CreateIntegerXState();
 begin
   // Create a Zero TIntegerX (a big integer with value as Zero)
-  ZeroX := TIntegerX.Create(0, TArray<UInt32>.Create());
+  ZeroX := TIntegerX.Create(0, Nil);
   // Create a One TIntegerX (a big integer with value as One)
-  OneX := TIntegerX.Create(1, TArray<UInt32>.Create(1));
+  OneX := TIntegerX.Create(1, TIntegerXUInt32Array.Create(1));
   // Create a Two TIntegerX (a big integer with value as Two)
-  TwoX := TIntegerX.Create(1, TArray<UInt32>.Create(2));
+  TwoX := TIntegerX.Create(1, TIntegerXUInt32Array.Create(2));
   // Create a Five TIntegerX (a big integer with value as Five)
-  FiveX := TIntegerX.Create(1, TArray<UInt32>.Create(5));
+  FiveX := TIntegerX.Create(1, TIntegerXUInt32Array.Create(5));
   // Create a Ten TIntegerX (a big integer with value as Ten)
-  TenX := TIntegerX.Create(1, TArray<UInt32>.Create(10));
+  TenX := TIntegerX.Create(1, TIntegerXUInt32Array.Create(10));
   // Create a NegativeOne TIntegerX (a big integer with value as NegativeOne)
-  NegativeOneX := TIntegerX.Create(-1, TArray<UInt32>.Create(1));
+  NegativeOneX := TIntegerX.Create(-1, TIntegerXUInt32Array.Create(1));
 
+{$IFDEF FPC}
+  _FS := DefaultFormatSettings;
+{$ELSE}
+{$IFDEF SUPPORT_TFORMATSETTINGS_CREATE_INSTANCE}
   _FS := TFormatSettings.Create;
 
-  FUIntLogTable := TArray<UInt32>.Create(0, 9, 99, 999, 9999, 99999, 999999,
-    9999999, 99999999, 999999999, MaxUInt32Value);
+{$ELSE}
+  GetLocaleFormatSettings(0, _FS);
+{$ENDIF}
+{$ENDIF}
+  FUIntLogTable := TIntegerXUInt32Array.Create(0, 9, 99, 999, 9999, 99999,
+    999999, 9999999, 99999999, 999999999, MaxUInt32Value);
 
-  FRadixDigitsPerDigit := TArray<Integer>.Create(0, 0, 31, 20, 15, 13, 12, 11,
-    10, 10, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-    6, 6, 6, 6);
+  FRadixDigitsPerDigit := TIntegerXIntegerArray.Create(0, 0, 31, 20, 15, 13, 12,
+    11, 10, 10, 9, 9, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6, 6);
 
-  FSuperRadix := TArray<UInt32>.Create(0, 0, $80000000, $CFD41B91, $40000000,
-    $48C27395, $81BF1000, $75DB9C97, $40000000, $CFD41B91, $3B9ACA00, $8C8B6D2B,
-    $19A10000, $309F1021, $57F6C100, $98C29B81, $10000000, $18754571, $247DBC80,
-    $3547667B, $4C4B4000, $6B5A6E1D, $94ACE180, $CAF18367, $B640000, $E8D4A51,
-    $1269AE40, $17179149, $1CB91000, $23744899, $2B73A840, $34E63B41, $40000000,
-    $4CFA3CC1, $5C13D840, $6D91B519, $81BF1000);
+  FSuperRadix := TIntegerXUInt32Array.Create(0, 0, $80000000, $CFD41B91,
+    $40000000, $48C27395, $81BF1000, $75DB9C97, $40000000, $CFD41B91, $3B9ACA00,
+    $8C8B6D2B, $19A10000, $309F1021, $57F6C100, $98C29B81, $10000000, $18754571,
+    $247DBC80, $3547667B, $4C4B4000, $6B5A6E1D, $94ACE180, $CAF18367, $B640000,
+    $E8D4A51, $1269AE40, $17179149, $1CB91000, $23744899, $2B73A840, $34E63B41,
+    $40000000, $4CFA3CC1, $5C13D840, $6D91B519, $81BF1000);
 
-  FBitsPerRadixDigit := TArray<Integer>.Create(0, 0, 1024, 1624, 2048, 2378,
-    2648, 2875, 3072, 3247, 3402, 3543, 3672, 3790, 3899, 4001, 4096, 4186,
-    4271, 4350, 4426, 4498, 4567, 4633, 4696, 4756, 4814, 4870, 4923, 4975,
-    5025, 5074, 5120, 5166, 5210, 5253, 5295);
+  FBitsPerRadixDigit := TIntegerXIntegerArray.Create(0, 0, 1024, 1624, 2048,
+    2378, 2648, 2875, 3072, 3247, 3402, 3543, 3672, 3790, 3899, 4001, 4096,
+    4186, 4271, 4350, 4426, 4498, 4567, 4633, 4696, 4756, 4814, 4870, 4923,
+    4975, 5025, 5074, 5120, 5166, 5210, 5253, 5295);
 
-  FTrailingZerosTable := TArray<Byte>.Create(0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0,
-    2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2,
-    0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0,
-    1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1,
-    0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 7, 0, 1, 0, 2, 0, 1, 0, 3,
-    0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0,
-    1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1,
-    0, 2, 0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0,
-    2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,
-    0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0);
+  FTrailingZerosTable := TBytes.Create(0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0,
+    1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1,
+    0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
+    6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3,
+    0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0,
+    1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 7, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1,
+    0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0,
+    2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2,
+    0, 1, 0, 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, 0, 1, 0, 2, 0,
+    1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1,
+    0, 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0);
 
 end;
 
@@ -1480,11 +1534,11 @@ begin
   most := UInt32(v shr BitsPerDigit);
   if (most = 0) then
   begin
-    result := TIntegerX.Create(1, TArray<UInt32>.Create(UInt32(v)));
+    result := TIntegerX.Create(1, TIntegerXUInt32Array.Create(UInt32(v)));
     Exit;
   end
   else
-    result := TIntegerX.Create(1, TArray<UInt32>.Create(most, UInt32(v)));
+    result := TIntegerX.Create(1, TIntegerXUInt32Array.Create(most, UInt32(v)));
 end;
 
 class function TIntegerX.Create(v: UInt32): TIntegerX;
@@ -1496,7 +1550,7 @@ begin
   end
   else
   begin
-    result := TIntegerX.Create(1, TArray<UInt32>.Create(v));
+    result := TIntegerX.Create(1, TIntegerXUInt32Array.Create(v));
     Exit;
   end;
 end;
@@ -1524,11 +1578,12 @@ begin
     most := UInt32(v shr BitsPerDigit);
     if (most = 0) then
     begin
-      result := TIntegerX.Create(Sign, TArray<UInt32>.Create(UInt32(v)));
+      result := TIntegerX.Create(Sign, TIntegerXUInt32Array.Create(UInt32(v)));
       Exit;
     end
     else
-      result := TIntegerX.Create(Sign, TArray<UInt32>.Create(most, UInt32(v)));
+      result := TIntegerX.Create(Sign, TIntegerXUInt32Array.Create(most,
+        UInt32(v)));
   end;
 end;
 
@@ -1539,7 +1594,7 @@ end;
 
 class function TIntegerX.Create(v: Double): TIntegerX;
 var
-  dbytes: TArray<Byte>;
+  dbytes: TBytes;
   significand: UInt64;
   exp: Integer;
   tempRes, res: TIntegerX;
@@ -1593,12 +1648,12 @@ begin
   result := Parse(v);
 end;
 
-class function TIntegerX.GetDoubleSign(v: TArray<Byte>): Integer;
+class function TIntegerX.GetDoubleSign(v: TBytes): Integer;
 begin
   result := v[7] and $80;
 end;
 
-class function TIntegerX.GetDoubleSignificand(v: TArray<Byte>): UInt64;
+class function TIntegerX.GetDoubleSignificand(v: TBytes): UInt64;
 
 var
   i1, i2: UInt32;
@@ -1610,7 +1665,7 @@ begin
   result := UInt64(UInt64(i1) or (UInt64(i2) shl 32));
 end;
 
-class function TIntegerX.GetDoubleBiasedExponent(v: TArray<Byte>): Word;
+class function TIntegerX.GetDoubleBiasedExponent(v: TBytes): Word;
 begin
   result := Word(((Word(v[7] and $7F)) shl Word(4)) or
     ((Word(v[6] and $F0)) shr 4));
@@ -1638,7 +1693,7 @@ begin
   _data := copy._data;
 end;
 
-constructor TIntegerX.Create(val: TArray<Byte>);
+constructor TIntegerX.Create(val: TBytes);
 begin
   if (Length(val) = 0) then
     raise EArgumentException.Create(ZeroLengthValue);
@@ -1660,7 +1715,7 @@ begin
   end;
 end;
 
-constructor TIntegerX.Create(Sign: Integer; data: TArray<UInt32>);
+constructor TIntegerX.Create(Sign: Integer; data: TIntegerXUInt32Array);
 begin
   if ((Sign < -1) or (Sign > 1)) then
     raise EArgumentException.Create(InvalidSign);
@@ -1706,7 +1761,7 @@ var
   len, minusIndex, plusIndex, index, numDigits, numBits, numUints, groupSize,
     firstGroupLen: Integer;
   mult, u: UInt32;
-  data: TArray<UInt32>;
+  data: TIntegerXUInt32Array;
 begin
   if ((radix < MinRadix) or (radix > MaxRadix)) then
   begin
@@ -1722,8 +1777,9 @@ begin
   // hyphen only bad, plus only bad,
   // hyphen not leading bad, plus not leading bad
   // (overkill) both hyphen and minus present (one would be caught by the tests above)
-  minusIndex := s.LastIndexOf('-');
-  plusIndex := s.LastIndexOf('+');
+  minusIndex := LastDelimiter('-', s) - 1;
+  plusIndex := LastDelimiter('+', s) - 1;
+
   if ((len = 0) or ((minusIndex = 0) and (len = 1)) or
     ((plusIndex = 0) and (len = 1)) or (minusIndex > 0) or (plusIndex > 0)) then
   begin
@@ -1742,7 +1798,7 @@ begin
   end;
 
   // skip leading zeros
-  while ((index < len) and (s.Chars[index] = '0')) do
+  while ((index < len) and (s[index + 1] = '0')) do
     Inc(index);
 
   if (index = len) then
@@ -1804,10 +1860,15 @@ function TIntegerX.ToString(radix: UInt32): String;
 var
   len, index, i: Integer;
   LSuperRadix, rem: UInt32;
-  working: TArray<UInt32>;
+  working: TIntegerXUInt32Array;
+{$IFDEF FPC}
+  rems: TFPGList<UInt32>;
+  sb: String;
+{$ELSE}
   rems: TList<UInt32>;
   sb: TStringBuilder;
-  charBuf: TArray<Char>;
+{$ENDIF}
+  charBuf: TIntegerXCharArray;
 begin
   if ((radix < UInt32(MinRadix)) or (radix > UInt32(MaxRadix))) then
     raise EArgumentOutOfRangeException.Create
@@ -1826,7 +1887,11 @@ begin
   LSuperRadix := FSuperRadix[radix];
 
   // TODO: figure out max, pre-allocate space (in List)
+{$IFDEF FPC}
+  rems := TFPGList<UInt32>.Create;
+{$ELSE}
   rems := TList<UInt32>.Create;
+{$ENDIF};
   try
     index := 0;
     while (index < len) do
@@ -1834,12 +1899,19 @@ begin
       rem := InPlaceDivRem(working, index, LSuperRadix);
       rems.Add(rem);
     end;
-
+{$IFNDEF FPC}
     sb := TStringBuilder.Create(rems.Count * FRadixDigitsPerDigit[radix] + 1);
+{$ELSE}
+    sb := '';
+{$ENDIF};
     try
 
       if (_sign < 0) then
+{$IFNDEF FPC}
         sb.Append('-');
+{$ELSE}
+        sb := '-';
+{$ENDIF}
       SetLength(charBuf, (FRadixDigitsPerDigit[radix]));
 
       AppendDigit(sb, rems[rems.Count - 1], radix, charBuf, false);
@@ -1849,9 +1921,15 @@ begin
         AppendDigit(sb, rems[i], radix, charBuf, true);
         Dec(i);
       end;
+{$IFNDEF FPC}
       result := sb.ToString();
+{$ELSE}
+      result := sb;
+{$ENDIF}
     finally
+{$IFNDEF FPC}
       sb.Free;
+{$ENDIF}
     end;
   finally
     rems.Free;
@@ -1859,23 +1937,25 @@ begin
 
 end;
 
-class procedure TIntegerX.AppendDigit(var sb: TStringBuilder; rem: UInt32;
-  radix: UInt32; charBuf: TArray<Char>; leadingZeros: Boolean);
+class procedure TIntegerX.AppendDigit(var sb:
+{$IFDEF FPC} String{$ELSE}TStringBuilder{$ENDIF}; rem: UInt32; radix: UInt32;
+  var charBuf: TIntegerXCharArray; leadingZeros: Boolean);
 const
 
   symbols = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var
   bufLen, i: Integer;
   digit: UInt32;
+  tempStr: String;
 begin
-
+  tempStr := '';
   bufLen := Length(charBuf);
   i := bufLen - 1;
   while ((i >= 0) and (rem <> 0)) do
   begin
     digit := rem mod radix;
     rem := rem div radix;
-    charBuf[i] := symbols.Chars[Integer(digit)];
+    charBuf[i] := symbols[Integer(digit) + 1];
     Dec(i);
   end;
 
@@ -1886,11 +1966,22 @@ begin
       charBuf[i] := '0';
       Dec(i);
     end;
-    sb.Append(charBuf);
-
+    SetString(tempStr, PChar(@charBuf[0]), Length(charBuf));
+{$IFNDEF FPC}
+    sb.Append(tempStr);
+{$ELSE}
+    sb := sb + tempStr;
+{$ENDIF}
   end
   else
-    sb.Append(charBuf, i + 1, bufLen - i - 1);
+  begin
+    SetString(tempStr, PChar(@charBuf[0]), Length(charBuf));
+{$IFNDEF FPC}
+    sb.Append(tempStr, i + 1, bufLen - i - 1);
+{$ELSE}
+    sb := sb + copy(tempStr, i + 2, bufLen - i - 1 + 1);
+{$ENDIF}
+  end;
 end;
 
 class function TIntegerX.TryParseUInt(val: String; startIndex: Integer;
@@ -1906,7 +1997,7 @@ begin
   while i < len do
   begin
 
-    if (not TryComputeDigitVal(val.Chars[startIndex + i], radix, v)) then
+    if (not TryComputeDigitVal(val[startIndex + i + 1], radix, v)) then
     begin
       result := false;
       Exit;
@@ -2585,8 +2676,8 @@ begin
 
 end;
 
-class function TIntegerX.Compare(x: TArray<UInt32>; y: TArray<UInt32>)
-  : SmallInt;
+class function TIntegerX.Compare(x: TIntegerXUInt32Array;
+  y: TIntegerXUInt32Array): SmallInt;
 var
   xlen, ylen, i: Integer;
 begin
@@ -2680,7 +2771,7 @@ end;
 function TIntegerX.Subtract(y: TIntegerX): TIntegerX;
 var
   cmp: Integer;
-  mag: TArray<UInt32>;
+  mag: TIntegerXUInt32Array;
 begin
   if (y._sign = 0) then
   begin
@@ -2721,7 +2812,7 @@ end;
 
 function TIntegerX.Multiply(y: TIntegerX): TIntegerX;
 var
-  mag: TArray<UInt32>;
+  mag: TIntegerXUInt32Array;
 begin
   if (self._sign = 0) then
   begin
@@ -2755,7 +2846,7 @@ end;
 
 function TIntegerX.DivRem(y: TIntegerX; out remainder: TIntegerX): TIntegerX;
 var
-  q, r: TArray<UInt32>;
+  q, r: TIntegerXUInt32Array;
 begin
 
   DivMod(_data, y._data, q, r);
@@ -3107,7 +3198,7 @@ end;
 function TIntegerX.BitwiseAnd(y: TIntegerX): TIntegerX;
 var
   rlen, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   xdigit, ydigit: UInt32;
   seenNonZeroX, seenNonZeroY: Boolean;
 
@@ -3137,7 +3228,7 @@ end;
 function TIntegerX.BitwiseOr(y: TIntegerX): TIntegerX;
 var
   rlen, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   seenNonZeroX, seenNonZeroY: Boolean;
   xdigit, ydigit: UInt32;
 begin
@@ -3166,7 +3257,7 @@ end;
 function TIntegerX.BitwiseXor(y: TIntegerX): TIntegerX;
 var
   rlen, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   seenNonZeroX, seenNonZeroY: Boolean;
   xdigit, ydigit: UInt32;
 begin
@@ -3195,7 +3286,7 @@ end;
 function TIntegerX.OnesComplement(): TIntegerX;
 var
   len, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   xdigit: UInt32;
   seenNonZero: Boolean;
 begin
@@ -3220,7 +3311,7 @@ end;
 function TIntegerX.BitwiseAndNot(y: TIntegerX): TIntegerX;
 var
   rlen, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   seenNonZeroX, seenNonZeroY: Boolean;
   xdigit, ydigit: UInt32;
 begin
@@ -3257,7 +3348,7 @@ end;
 function TIntegerX.SetBit(n: Integer): TIntegerX;
 var
   index, len, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   seenNonZero: Boolean;
 begin
   // This will work if the bit is already set.
@@ -3293,7 +3384,7 @@ end;
 function TIntegerX.ClearBit(n: Integer): TIntegerX;
 var
   index, len, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   seenNonZero: Boolean;
 begin
 
@@ -3330,7 +3421,7 @@ end;
 function TIntegerX.FlipBit(n: Integer): TIntegerX;
 var
   index, len, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   seenNonZero: Boolean;
 begin
   if (n < 0) then
@@ -3362,7 +3453,7 @@ end;
 function TIntegerX.LeftShift(shift: Integer): TIntegerX;
 var
   digitShift, bitShift, xlen, rShift, i, j: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   highBits: UInt32;
 begin
   if (shift = 0) then
@@ -3427,7 +3518,7 @@ end;
 function TIntegerX.RightShift(shift: Integer): TIntegerX;
 var
   digitShift, bitShift, xlen, lShift, rlen, i, j: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   highBits: UInt32;
 begin
 
@@ -3609,7 +3700,8 @@ begin
 
 end;
 
-class function TIntegerX.MakeTwosComplement(a: TArray<UInt32>): TArray<UInt32>;
+class function TIntegerX.MakeTwosComplement(a: TIntegerXUInt32Array)
+  : TIntegerXUInt32Array;
 var
   i: Integer;
   digit: UInt32;
@@ -3659,14 +3751,14 @@ begin
   end;
 end;
 
-function TIntegerX.GetMagnitude(): TArray<UInt32>;
+function TIntegerX.GetMagnitude(): TIntegerXUInt32Array;
 begin
   result := copy(self._data, 0, Length(self._data));
 end;
 
 function TIntegerX.BitLength(): UInt32;
 var
-  m: TArray<UInt32>;
+  m: TIntegerXUInt32Array;
   len, n, magBitLength, i: UInt32;
   pow2: Boolean;
 begin
@@ -3704,7 +3796,7 @@ end;
 function TIntegerX.BitCount(): UInt32;
 var
   bc, i, len, magTrailingZeroCount, j: UInt32;
-  m: TArray<Cardinal>;
+  m: TIntegerXUInt32Array;
 begin
   m := self._data;
   bc := 0;
@@ -3728,12 +3820,12 @@ begin
 
     magTrailingZeroCount := magTrailingZeroCount +
       UInt32(TrailingZerosCount(m[j]));
-    bc := bc + magTrailingZeroCount - 1;
+    bc := bc + magTrailingZeroCount - UInt32(1);
   end;
   result := bc;
 end;
 
-function TIntegerX.ToByteArray(): TArray<Byte>;
+function TIntegerX.ToByteArray(): TBytes;
 var
   byteLen, i, bytesCopied, nextInt, intIndex: Integer;
 begin
@@ -3765,7 +3857,7 @@ end;
 function TIntegerX.GetPrecision: UInt32;
 var
   digits: UInt32;
-  work: TArray<UInt32>;
+  work: TIntegerXUInt32Array;
   index: Integer;
 
 begin
@@ -3810,10 +3902,10 @@ begin
   result := 0;
 end;
 
-class function TIntegerX.Add(x: TArray<UInt32>; y: TArray<UInt32>)
-  : TArray<UInt32>;
+class function TIntegerX.Add(x: TIntegerXUInt32Array; y: TIntegerXUInt32Array)
+  : TIntegerXUInt32Array;
 var
-  temp, tempRes: TArray<UInt32>;
+  temp, tempRes: TIntegerXUInt32Array;
   xi, yi: Integer;
   sum: UInt64;
 begin
@@ -3865,10 +3957,10 @@ begin
   result := tempRes;
 end;
 
-class function TIntegerX.AddSignificantDigit(x: TArray<UInt32>;
-  newDigit: UInt32): TArray<UInt32>;
+class function TIntegerX.AddSignificantDigit(x: TIntegerXUInt32Array;
+  newDigit: UInt32): TIntegerXUInt32Array;
 var
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   i: Integer;
 begin
   SetLength(tempRes, Length(x) + 1);
@@ -3882,11 +3974,11 @@ begin
   result := tempRes;
 end;
 
-class function TIntegerX.Subtract(xs: TArray<UInt32>; ys: TArray<UInt32>)
-  : TArray<UInt32>;
+class function TIntegerX.Subtract(xs: TIntegerXUInt32Array;
+  ys: TIntegerXUInt32Array): TIntegerXUInt32Array;
 var
   xlen, ylen, ix, iy: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
   borrow: Boolean;
   x, y: UInt32;
 begin
@@ -3937,11 +4029,11 @@ begin
   result := RemoveLeadingZeros(tempRes);
 end;
 
-class function TIntegerX.Multiply(xs: TArray<UInt32>; ys: TArray<UInt32>)
-  : TArray<UInt32>;
+class function TIntegerX.Multiply(xs: TIntegerXUInt32Array;
+  ys: TIntegerXUInt32Array): TIntegerXUInt32Array;
 var
   xlen, ylen, xi, zi, yi: Integer;
-  zs: TArray<UInt32>;
+  zs: TIntegerXUInt32Array;
   x, product: UInt64;
 begin
   xlen := Length(xs);
@@ -3976,8 +4068,9 @@ begin
   result := RemoveLeadingZeros(zs);
 end;
 
-class procedure TIntegerX.DivMod(x: TArray<UInt32>; y: TArray<UInt32>;
-  out q: TArray<UInt32>; out r: TArray<UInt32>);
+class procedure TIntegerX.DivMod(x: TIntegerXUInt32Array;
+  y: TIntegerXUInt32Array; out q: TIntegerXUInt32Array;
+  out r: TIntegerXUInt32Array);
 const
   SuperB: UInt64 = $100000000;
 var
@@ -3985,7 +4078,7 @@ var
   rem: UInt32;
   toptwo, qhat, rhat, val, carry: UInt64;
   borrow, temp: Int64;
-  xnorm, ynorm: TArray<UInt32>;
+  xnorm, ynorm: TIntegerXUInt32Array;
 
 begin
   // Handle some special cases first.
@@ -4011,8 +4104,8 @@ begin
   // Special case: dividend = divisor
   if (cmp = 0) then
   begin
-    q := TArray<UInt32>.Create(1);
-    r := TArray<UInt32>.Create(0);
+    q := TIntegerXUInt32Array.Create(1);
+    r := TIntegerXUInt32Array.Create(0);
     Exit;
   end;
 
@@ -4028,13 +4121,13 @@ begin
   if (ylen = 1) then
   begin
     rem := CopyDivRem(x, y[0], q);
-    r := TArray<UInt32>.Create(rem);
+    r := TIntegerXUInt32Array.Create(rem);
     Exit;
   end;
 
   // Okay.
   // Special cases out of the way, let do Knuth's algorithm.
-  // THis is almost exactly the same as in DLR's BigInteger.
+  // This is almost exactly the same as in DLR's BigInteger.
   // TODO:  Look at the optimizations in the Colin Plumb C library
   // (used in the Java BigInteger code).
 
@@ -4124,8 +4217,8 @@ begin
   Unnormalize(xnorm, r, shift);
 end;
 
-class procedure TIntegerX.Normalize(var xnorm: TArray<UInt32>; xnlen: Integer;
-  x: TArray<UInt32>; xlen: Integer; shift: Integer);
+class procedure TIntegerX.Normalize(var xnorm: TIntegerXUInt32Array;
+  xnlen: Integer; x: TIntegerXUInt32Array; xlen: Integer; shift: Integer);
 
 var
   sameLen: Boolean;
@@ -4172,8 +4265,8 @@ begin
     xnorm[0] := carry;
 end;
 
-class procedure TIntegerX.Unnormalize(xnorm: TArray<UInt32>;
-  out r: TArray<UInt32>; shift: Integer);
+class procedure TIntegerX.Unnormalize(xnorm: TIntegerXUInt32Array;
+  out r: TIntegerXUInt32Array; shift: Integer);
 
 var
   len, lShift, i: Integer;
@@ -4209,8 +4302,8 @@ begin
   r := RemoveLeadingZeros(r);
 end;
 
-class procedure TIntegerX.InPlaceMulAdd(var data: TArray<UInt32>; mult: UInt32;
-  addend: UInt32);
+class procedure TIntegerX.InPlaceMulAdd(var data: TIntegerXUInt32Array;
+  mult: UInt32; addend: UInt32);
 
 var
   len, i: Integer;
@@ -4246,11 +4339,11 @@ begin
 
 end;
 
-class function TIntegerX.RemoveLeadingZeros(data: TArray<UInt32>)
-  : TArray<UInt32>;
+class function TIntegerX.RemoveLeadingZeros(data: TIntegerXUInt32Array)
+  : TIntegerXUInt32Array;
 var
   len, index, i: Integer;
-  tempRes: TArray<UInt32>;
+  tempRes: TIntegerXUInt32Array;
 begin
   len := Length(data);
   index := 0;
@@ -4274,7 +4367,7 @@ begin
   result := tempRes;
 end;
 
-class function TIntegerX.StripLeadingZeroBytes(a: TArray<Byte>): TArray<UInt32>;
+class function TIntegerX.StripLeadingZeroBytes(a: TBytes): TIntegerXUInt32Array;
 var
   byteLength, keep, intLength, b, i, bytesRemaining, bytesToTransfer,
     j: Integer;
@@ -4311,7 +4404,7 @@ begin
 
 end;
 
-class function TIntegerX.makePositive(a: TArray<Byte>): TArray<UInt32>;
+class function TIntegerX.makePositive(a: TBytes): TIntegerXUInt32Array;
 var
   keep, k, byteLength, extraByte, intLength, b, i, numBytesToTransfer, j,
     mask: Integer;
@@ -4381,7 +4474,7 @@ begin
 
 end;
 
-class function TIntegerX.InPlaceDivRem(var data: TArray<UInt32>;
+class function TIntegerX.InPlaceDivRem(var data: TIntegerXUInt32Array;
   var index: Integer; divisor: UInt32): UInt32;
 var
   rem: UInt64;
@@ -4413,8 +4506,8 @@ begin
   result := UInt32(rem);
 end;
 
-class function TIntegerX.CopyDivRem(data: TArray<UInt32>; divisor: UInt32;
-  out quotient: TArray<UInt32>): UInt32;
+class function TIntegerX.CopyDivRem(data: TIntegerXUInt32Array; divisor: UInt32;
+  out quotient: TIntegerXUInt32Array): UInt32;
 var
   rem: UInt64;
   len, i: Integer;
@@ -4524,5 +4617,9 @@ class function TIntegerX.GetNegativeOne: TIntegerX;
 begin
   result := NegativeOneX;
 end;
+
+initialization
+
+TIntegerX.CreateIntegerXState();
 
 end.

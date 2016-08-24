@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <PathDelim Value="\"/>
+    <Name Value="BaseNcodingPascalPackage"/>
+    <Type Value="RunTimeOnly"/>
+    <Author Value="Xor-el (Ugochukwu Mmaduekwe)"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <PathDelim Value="\"/>
+      <SearchPaths>
+        <IncludeFiles Value="..\..\Include"/>
+        <OtherUnitFiles Value="..\..\BaseUnits;..\..\UtilityUnits"/>
+        <UnitOutputDirectory Value="lib\BaseNcodingPascal\$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <CodeGeneration>
+        <Optimizations>
+          <OptimizationLevel Value="4"/>
+        </Optimizations>
+      </CodeGeneration>
+    </CompilerOptions>
+    <Description Value="BaseNcodingPascal is a Delphi/FPC compatible library that provides an easy to use interface for computing various bases of strings and byte arrays."/>
+    <License Value="MIT License"/>
+    <Version Major="1"/>
+    <Files Count="17">
+      <Item1>
+        <Filename Value="..\..\BaseUnits\uBase.pas"/>
+        <UnitName Value="uBase"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\..\BaseUnits\uBase32.pas"/>
+        <UnitName Value="uBase32"/>
+      </Item2>
+      <Item3>
+        <Filename Value="..\..\BaseUnits\uBase64.pas"/>
+        <UnitName Value="uBase64"/>
+      </Item3>
+      <Item4>
+        <Filename Value="..\..\BaseUnits\uBase85.pas"/>
+        <UnitName Value="uBase85"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\..\BaseUnits\uBase91.pas"/>
+        <UnitName Value="uBase91"/>
+      </Item5>
+      <Item6>
+        <Filename Value="..\..\BaseUnits\uBase128.pas"/>
+        <UnitName Value="uBase128"/>
+      </Item6>
+      <Item7>
+        <Filename Value="..\..\BaseUnits\uBase256.pas"/>
+        <UnitName Value="uBase256"/>
+      </Item7>
+      <Item8>
+        <Filename Value="..\..\BaseUnits\uBase1024.pas"/>
+        <UnitName Value="uBase1024"/>
+      </Item8>
+      <Item9>
+        <Filename Value="..\..\BaseUnits\uBase4096.pas"/>
+        <UnitName Value="uBase4096"/>
+      </Item9>
+      <Item10>
+        <Filename Value="..\..\BaseUnits\uBaseBigN.pas"/>
+        <UnitName Value="uBaseBigN"/>
+      </Item10>
+      <Item11>
+        <Filename Value="..\..\BaseUnits\uBaseN.pas"/>
+        <UnitName Value="uBaseN"/>
+      </Item11>
+      <Item12>
+        <Filename Value="..\..\BaseUnits\uZBase32.pas"/>
+        <UnitName Value="uZBase32"/>
+      </Item12>
+      <Item13>
+        <Filename Value="..\..\Include\BaseNcoding.inc"/>
+        <Type Value="Include"/>
+      </Item13>
+      <Item14>
+        <Filename Value="..\..\Include\Helper.inc"/>
+        <Type Value="Include"/>
+      </Item14>
+      <Item15>
+        <Filename Value="..\..\UtilityUnits\uBaseNcodingTypes.pas"/>
+        <UnitName Value="uBaseNcodingTypes"/>
+      </Item15>
+      <Item16>
+        <Filename Value="..\..\UtilityUnits\IntegerX.pas"/>
+        <UnitName Value="IntegerX"/>
+      </Item16>
+      <Item17>
+        <Filename Value="..\..\UtilityUnits\uUtils.pas"/>
+        <UnitName Value="uUtils"/>
+      </Item17>
+    </Files>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

@@ -1,26 +1,39 @@
 ﻿unit uZBase32;
 
-{$ZEROBASEDSTRINGS ON}
+{$I ..\Include\BaseNcoding.inc}
 
 interface
 
 uses
-
+{$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
   System.Math,
+{$ELSE}
+  SysUtils,
+  Math,
+{$ENDIF}
+{$IFDEF FPC}
+  fgl,
+{$ELSE}
+{$IFDEF SCOPEDUNITNAMES}
   System.Generics.Collections,
+{$ELSE}
+  Generics.Collections,
+{$ENDIF}
+{$ENDIF}
   uBase,
-  uUtils;
+  uUtils,
+  uBaseNcodingTypes;
 
 type
 
   IZBase32 = interface
     ['{96264326-C333-4642-A9C6-BDEA183E6597}']
 
-    function Encode(data: TArray<Byte>): String;
-    function Decode(const data: String): TArray<Byte>;
-    function EncodeString(const data: String): String;
-    function DecodeToString(const data: String): String;
+    function Encode(data: TBytes): TBaseNcodingString;
+    function Decode(const data: TBaseNcodingString): TBytes;
+    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
+    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
     function GetBitsPerChars: Double;
     property BitsPerChars: Double read GetBitsPerChars;
     function GetCharsCount: UInt32;
@@ -29,10 +42,10 @@ type
     property BlockBitsCount: Integer read GetBlockBitsCount;
     function GetBlockCharsCount: Integer;
     property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: String;
-    property Alphabet: String read GetAlphabet;
-    function GetSpecial: Char;
-    property Special: Char read GetSpecial;
+    function GetAlphabet: TBaseNcodingString;
+    property Alphabet: TBaseNcodingString read GetAlphabet;
+    function GetSpecial: TBaseNcodingChar;
+    property Special: TBaseNcodingChar read GetSpecial;
     function GetHaveSpecial: Boolean;
     property HaveSpecial: Boolean read GetHaveSpecial;
     function GetEncoding: TEncoding;
@@ -45,36 +58,44 @@ type
 
   strict private
 
-    function CreateIndexByOctetAndMovePosition(const data: String;
-      currentPosition: Integer; var index: TArray<Integer>): Integer;
+    function CreateIndexByOctetAndMovePosition(const data: TBaseNcodingString;
+      currentPosition: Integer; var index: TBaseNcodingIntegerArray): Integer;
 
   public
 
     const
 
-    DefaultAlphabet = 'ybndrfg8ejkmcpqxot1uwisza345h769';
-    DefaultSpecial = Char(0);
+    DefaultAlphabet: Array [0 .. 31] of TBaseNcodingChar = ('y', 'b', 'n', 'd',
+      'r', 'f', 'g', '8', 'e', 'j', 'k', 'm', 'c', 'p', 'q', 'x', 'o', 't', '1',
+      'u', 'w', 'i', 's', 'z', 'a', '3', '4', '5', 'h', '7', '6', '9');
+
+    DefaultSpecial = TBaseNcodingChar(0);
 
     /// <summary>
-    /// From: https://github.com/denxc/ZBase32Encoder/blob/master/ZBase32Encoder/ZBase32Encoder/ZBase32Encoder.cs
+    /// From: <seealso href="https://github.com/denxc/ZBase32Encoder/blob/master/ZBase32Encoder/ZBase32Encoder/ZBase32Encoder.cs">[ZBase32Encoder in CSharp]</seealso>
     /// </summary>
 
-    constructor Create(const _Alphabet: String = DefaultAlphabet;
-      _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
+    constructor Create(_Alphabet: TBaseNcodingString = '';
+      _Special: TBaseNcodingChar = DefaultSpecial;
+      _textEncoding: TEncoding = Nil);
 
     function GetHaveSpecial: Boolean; override;
-    function Encode(data: TArray<Byte>): String; override;
-    function Decode(const data: String): TArray<Byte>; override;
+    function Encode(data: TBytes): TBaseNcodingString; override;
+    function Decode(const data: TBaseNcodingString): TBytes; override;
 
   end;
 
 implementation
 
-constructor TZBase32.Create(const _Alphabet: String = DefaultAlphabet;
-  _Special: Char = DefaultSpecial; _textEncoding: TEncoding = Nil);
+constructor TZBase32.Create(_Alphabet: TBaseNcodingString = '';
+  _Special: TBaseNcodingChar = DefaultSpecial; _textEncoding: TEncoding = Nil);
 begin
+  if _Alphabet = '' then
+  begin
+    SetString(_Alphabet, PBaseNcodingChar(@DefaultAlphabet[0]),
+      Length(DefaultAlphabet));
+  end;
   Inherited Create(32, _Alphabet, _Special, _textEncoding);
-  FHaveSpecial := False;
 end;
 
 function TZBase32.GetHaveSpecial: Boolean;
@@ -82,8 +103,9 @@ begin
   result := False;
 end;
 
-function TZBase32.CreateIndexByOctetAndMovePosition(const data: String;
-  currentPosition: Integer; var index: TArray<Integer>): Integer;
+function TZBase32.CreateIndexByOctetAndMovePosition
+  (const data: TBaseNcodingString; currentPosition: Integer;
+  var index: TBaseNcodingIntegerArray): Integer;
 var
   j: Integer;
 
@@ -100,13 +122,13 @@ begin
       continue;
     end;
 
-    if (FInvAlphabet[Ord(data[currentPosition])] = -1) then
+    if (FInvAlphabet[Ord(data[(currentPosition) + 1])] = -1) then
     begin
       inc(currentPosition);
       continue;
     end;
 
-    index[j] := Ord(data[currentPosition]);
+    index[j] := Ord(data[(currentPosition) + 1]);
     inc(j);
 
     inc(currentPosition);
@@ -118,9 +140,14 @@ end;
 
 {$OVERFLOWCHECKS OFF}
 
-function TZBase32.Encode(data: TArray<Byte>): String;
+function TZBase32.Encode(data: TBytes): TBaseNcodingString;
 var
+{$IFNDEF FPC}
   encodedResult: TStringBuilder;
+{$ELSE}
+  encodedResult: TFPGList<TBaseNcodingChar>;
+  uC: TBaseNcodingChar;
+{$ENDIF}
   i, j, byteCount, bitCount, dataLength, index: Integer;
   buffer: UInt64;
   temp: Double;
@@ -131,9 +158,13 @@ begin
   end;
 
   dataLength := Length(data);
-
-  temp := Length(data) * 8.0 / 5.0;
+  temp := dataLength * 8.0 / 5.0;
+{$IFDEF FPC}
+  encodedResult := TFPGList<TBaseNcodingChar>.Create;
+  encodedResult.Capacity := (Ceil(temp));
+{$ELSE}
   encodedResult := TStringBuilder.Create((Ceil(temp)));
+{$ENDIF}
   try
     i := 0;
     while i < dataLength do
@@ -162,26 +193,42 @@ begin
             shl (5 - bitCount);
 
         end;
+{$IFDEF FPC}
+        encodedResult.Add(DefaultAlphabet[index]);
+{$ELSE}
         encodedResult.Append(DefaultAlphabet[index]);
-
+{$ENDIF}
         dec(bitCount, 5);
       end;
 
       inc(i, 5);
     end;
+{$IFDEF FPC}
+    result := '';
+    for uC in encodedResult do
+    begin
+      result := result + uC;
+    end;
+{$ELSE}
     result := encodedResult.ToString;
+{$ENDIF}
   finally
     encodedResult.Free;
   end;
 end;
 
-function TZBase32.Decode(const data: String): TArray<Byte>;
+function TZBase32.Decode(const data: TBaseNcodingString): TBytes;
 var
-  index: TArray<Integer>;
-  i, j, shortByteCount, bitCount: Integer;
+  index: TBaseNcodingIntegerArray;
+  i, j, k, shortByteCount, bitCount: Integer;
+  b: Byte;
   buffer: UInt64;
   temp: Double;
-  tempResult: TList<Byte>;
+{$IFDEF FPC}
+  tempResult: TFPGList<Byte>
+{$ELSE}
+  tempResult: TList<Byte>
+{$ENDIF};
 begin
   if TUtils.isNullOrEmpty(data) then
 
@@ -191,7 +238,11 @@ begin
     Exit;
   end;
 
+{$IFDEF FPC}
+  tempResult := TFPGList<Byte>.Create;
+{$ELSE}
   tempResult := TList<Byte>.Create;
+{$ENDIF};
   temp := (Length(data)) * 5.0 / 8.0;
   tempResult.Capacity := Integer(Ceil(temp));
   try
@@ -228,7 +279,13 @@ begin
 
     end;
 
-    result := tempResult.ToArray;
+    SetLength(result, tempResult.Count);
+    k := 0;
+    for b in tempResult do
+    begin
+      result[k] := b;
+      inc(k);
+    end;
   finally
     tempResult.Free;
 
