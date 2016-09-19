@@ -3,7 +3,9 @@
 interface
 
 uses
-  Classes, SysUtils, uBase;
+  Classes,
+  SysUtils,
+  uIBaseInterfaces;
 
 type
 

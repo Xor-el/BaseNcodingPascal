@@ -5,7 +5,14 @@ unit Base85Tests;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, BaseTests, uBase, uBase85;
+  Classes,
+  SysUtils,
+  fpcunit,
+  testregistry,
+  BaseTests,
+  uBase85,
+  uUtils,
+  uIBaseInterfaces;
 
 type
 
@@ -113,11 +120,11 @@ begin
   strBuilder := '';
   if ((F_btInstance.FConverter.HaveSpecial) and
     (Trunc(F_btInstance.FConverter.BitsPerChars) mod 1 = 0) and
-    (TBase.IsPowerOf2(UInt32(Trunc(F_btInstance.FConverter.BitsPerChars))))) then
+    (TUtils.IsPowerOf2(UInt32(Trunc(F_btInstance.FConverter.BitsPerChars))))) then
   begin
     bitsPerChar := Trunc(F_btInstance.FConverter.BitsPerChars);
     bitsPerByte := 8;
-    charByteBitsLcm := TBase.LCM(bitsPerByte, bitsPerChar);
+    charByteBitsLcm := TUtils.LCM(bitsPerByte, bitsPerChar);
     maxTailLength := charByteBitsLcm div bitsPerByte - 1;
 
     for i := 0 to (maxTailLength + 2) do

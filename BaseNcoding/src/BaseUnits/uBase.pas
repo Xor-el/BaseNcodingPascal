@@ -5,54 +5,40 @@ unit uBase;
 interface
 
 uses
+
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Math,
+  System.Math
 {$ELSE}
-  SysUtils,
-  Math,
+    SysUtils,
+  Math
 {$ENDIF}
-  IntegerX,
-  uUtils,
+    , uUtils,
+  uIBaseInterfaces,
   uBaseNcodingTypes;
+
+resourcestring
+
+  SCharCount = 'Base string should contain %u chars';
+  SDistinctChars = 'Base string should contain distinct chars';
+  SSpecialChar = 'Base string should not contain special char';
 
 type
 
-  IBase = interface
-    ['{105A4B0A-69E8-41D1-9954-5D1CED996326}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-    function GetParallel: Boolean;
-    procedure SetParallel(value: Boolean);
-    property Parallel: Boolean read GetParallel write SetParallel;
-{$ENDIF}
-  end;
-
   TBase = class abstract(TInterfacedObject, IBase)
 
-  protected
+  strict protected
 
+    FCharsCount: UInt32;
+    FBlockBitsCount, FBlockCharsCount: Integer;
+    FAlphabet: TBaseNcodingString;
+    FSpecial: TBaseNcodingChar;
+    FHaveSpecial: Boolean;
+    FEncoding: TEncoding;
+    FInvAlphabet: TBaseNcodingIntegerArray;
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
+    FParallel: Boolean;
+{$ENDIF}
     function GetBitsPerChars: Double;
     function GetCharsCount: UInt32;
     procedure SetCharsCount(value: UInt32);
@@ -71,25 +57,16 @@ type
     function GetParallel: Boolean;
     procedure SetParallel(value: Boolean);
 {$ENDIF}
-  protected
+    function GetName: TBaseNcodingString; virtual;
 
-    // class var
-    FCharsCount: UInt32;
-    FBlockBitsCount, FBlockCharsCount: Integer;
-    FAlphabet: TBaseNcodingString;
-    FSpecial: TBaseNcodingChar;
-    FHaveSpecial: Boolean;
-    FEncoding: TEncoding;
-{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-    FParallel: Boolean;
-{$ENDIF}
   public
 
-    constructor Create(_charsCount: LongWord;
-      const _alphabet: TBaseNcodingString; const _special: TBaseNcodingChar;
+    constructor Create(_charsCount: UInt32; const _alphabet: TBaseNcodingString;
+      const _special: TBaseNcodingChar;
       _encoding: TEncoding = Nil{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
       ; _parallel: Boolean = False
 {$ENDIF});
+
     function EncodeString(const data: TBaseNcodingString)
       : TBaseNcodingString; virtual;
     function Encode(data: TBytes): TBaseNcodingString; virtual; abstract;
@@ -97,36 +74,8 @@ type
       : TBaseNcodingString; virtual;
     function Decode(const data: TBaseNcodingString): TBytes; virtual; abstract;
 
-    /// <summary>
-    /// From: http://stackoverflow.com/a/600306/1046374
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-
-    class function IsPowerOf2(x: LongWord): Boolean; static;
-
-    /// <summary>
-    /// From: http://stackoverflow.com/a/13569863/1046374
-    /// </summary>
-
-    class function LCM(a, b: Integer): Integer; static;
-    class function NextPowOf2(x: LongWord): LongWord; static;
-    class function IntPow(x: UInt64; exp: Integer): UInt64; static;
-    class function BigIntPow(x: TIntegerX; exp: Integer): TIntegerX; static;
-    class function LogBase2(x: LongWord): Integer; overload; static;
-    class function LogBase2(x: UInt64): Integer; overload; static;
-    class function LogBaseN(x, n: LongWord): Integer; overload; static;
-    class function LogBaseN(x: UInt64; n: LongWord): Integer; overload; static;
-    class function GetOptimalBitsCount(CharsCount: LongWord;
-      out charsCountInBits: LongWord; maxBitsCount: LongWord = 64;
-      radix: LongWord = 2): Integer; static;
-    class function GetOptimalBitsCount2(CharsCount: LongWord;
-      out charsCountInBits: LongWord; maxBitsCount: LongWord = 64;
-      base2BitsCount: Boolean = False): Integer; static;
-
     property BitsPerChars: Double read GetBitsPerChars;
-    property CharsCount: UInt32 read GetCharsCount
-      write SetCharsCount;
+    property CharsCount: UInt32 read GetCharsCount write SetCharsCount;
     property BlockBitsCount: Integer read GetBlockBitsCount
       write SetBlockBitsCount;
     property BlockCharsCount: Integer read GetBlockCharsCount
@@ -138,15 +87,12 @@ type
 {$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     property Parallel: Boolean read GetParallel write SetParallel;
 {$ENDIF}
-  protected
-
-    FInvAlphabet: TBaseNcodingIntegerArray;
-
+    property Name: TBaseNcodingString read GetName;
   end;
 
 implementation
 
-constructor TBase.Create(_charsCount: LongWord;
+constructor TBase.Create(_charsCount: UInt32;
   const _alphabet: TBaseNcodingString; const _special: TBaseNcodingChar;
   _encoding: TEncoding = Nil{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
   ; _parallel: Boolean = False
@@ -158,30 +104,27 @@ begin
   Inherited Create;
   if ((UInt32(Length(_alphabet))) <> _charsCount) then
 
-    raise EArgumentException.Create
-      (Format('Base string should contain %u chars', [_charsCount]));
+    raise EArgumentException.CreateResFmt(@SCharCount, [_charsCount]);
 
   for i := 1 to _charsCount do
   begin
     for j := Succ(i) to _charsCount do
     begin
       if (_alphabet[i] = _alphabet[j]) then
-        raise EArgumentException.Create
-          ('Base string should contain distinct chars');
+        raise EArgumentException.CreateRes(@SDistinctChars);
 
     end;
 
   end;
 
   if TUtils.CustomMatchStr(_special, _alphabet) then
-    raise EArgumentException.Create
-      ('Base string should not contain special char');
+    raise EArgumentException.CreateRes(@SSpecialChar);
 
   CharsCount := _charsCount;
   Alphabet := _alphabet;
   Special := _special;
-  bitsPerChar := LogBase2(_charsCount);
-  BlockBitsCount := LCM(bitsPerChar, 8);
+  bitsPerChar := TUtils.LogBase2(_charsCount);
+  BlockBitsCount := TUtils.LCM(bitsPerChar, 8);
   BlockCharsCount := BlockBitsCount div bitsPerChar;
 
   alphabetMax := TUtils.RetreiveMax(Alphabet);
@@ -289,6 +232,11 @@ end;
 
 {$ENDIF}
 
+function TBase.GetName: TBaseNcodingString;
+begin
+  result := Self.ClassName;
+end;
+
 function TBase.EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
 
 begin
@@ -300,236 +248,6 @@ function TBase.DecodeToString(const data: TBaseNcodingString)
 begin
   result := Encoding.GetString(Decode(StringReplace(data, sLineBreak, '',
     [rfReplaceAll])));
-end;
-
-class function TBase.IsPowerOf2(x: LongWord): Boolean;
-var
-  xint: LongWord;
-begin
-  xint := LongWord(x);
-
-  if (x - xint <> 0) then
-
-    result := False
-  else
-
-    result := (xint and (xint - 1)) = 0;
-end;
-
-class function TBase.LCM(a, b: Integer): Integer;
-var
-  num1, num2, i: Integer;
-
-begin
-
-  if (a > b) then
-  begin
-    num1 := a;
-    num2 := b;
-  end
-
-  else
-  begin
-    num1 := b;
-    num2 := a;
-  end;
-
-  for i := 1 to (num2) do
-
-  begin
-    if ((num1 * i) mod num2 = 0) then
-    begin
-      result := i * num1;
-      Exit;
-    end;
-
-  end;
-  result := num2;
-
-end;
-
-class function TBase.NextPowOf2(x: LongWord): LongWord;
-
-begin
-  dec(x);
-  x := x or (x shr 1);
-  x := x or (x shr 2);
-  x := x or (x shr 4);
-  x := x or (x shr 8);
-  x := x or (x shr 16);
-  inc(x);
-  result := x;
-
-end;
-
-class function TBase.IntPow(x: UInt64; exp: Integer): UInt64;
-var
-  tempResult: UInt64;
-  i: Integer;
-begin
-  tempResult := 1;
-  i := 0;
-
-  while i < exp do
-  begin
-    tempResult := tempResult * x;
-    inc(i);
-  end;
-
-  result := tempResult;
-
-end;
-
-class function TBase.BigIntPow(x: TIntegerX; exp: Integer): TIntegerX;
-var
-  tempResult: TIntegerX;
-  i: Integer;
-begin
-  tempResult := 1;
-  i := 0;
-
-  while i < exp do
-  begin
-    tempResult := tempResult * x;
-    inc(i);
-  end;
-
-  result := tempResult;
-
-end;
-
-class function TBase.LogBase2(x: LongWord): Integer;
-var
-  r: Integer;
-begin
-  r := 0;
-  x := x shr 1;
-  while ((x) <> 0) do
-  begin
-    inc(r);
-    x := x shr 1;
-  end;
-  result := r;
-
-end;
-
-class function TBase.LogBase2(x: UInt64): Integer;
-var
-  r: Integer;
-begin
-  r := 0;
-  x := x shr 1;
-  while ((x) <> 0) do
-  begin
-    inc(r);
-    x := x shr 1;
-  end;
-  result := r;
-
-end;
-
-class function TBase.LogBaseN(x, n: LongWord): Integer;
-var
-  r: Integer;
-begin
-  r := 0;
-  x := x div n;
-  while ((x) <> 0) do
-  begin
-    inc(r);
-    x := x div n;
-  end;
-  result := r;
-end;
-
-class function TBase.LogBaseN(x: UInt64; n: LongWord): Integer;
-var
-  r: Integer;
-begin
-  r := 0;
-  x := x div n;
-  while ((x) <> 0) do
-  begin
-    inc(r);
-    x := x div n;
-  end;
-  result := r;
-end;
-
-class function TBase.GetOptimalBitsCount(CharsCount: LongWord;
-  out charsCountInBits: LongWord; maxBitsCount: LongWord = 64;
-  radix: LongWord = 2): Integer;
-var
-  maxRatio, ratio, charsCountLog, temp, dCharsCount, dradix, multemp: Double;
-  n, n1: Integer;
-  l1: LongWord;
-
-begin
-  result := 0;
-  charsCountInBits := 0;
-  n1 := LogBaseN(CharsCount, radix);
-  dCharsCount := (CharsCount * 1.0);
-  dradix := (radix * 1.0);
-  charsCountLog := LogN(dCharsCount, dradix);
-  maxRatio := 0;
-
-  n := n1;
-  while (UInt32(n) <= maxBitsCount) do
-  begin
-    temp := n * charsCountLog;
-    l1 := UInt32(Ceil(temp));
-    multemp := (n * 1.0);
-    ratio := multemp / l1;
-    if (ratio > maxRatio) then
-    begin
-      maxRatio := ratio;
-      result := n;
-      charsCountInBits := l1;
-    end;
-    inc(n);
-  end;
-
-end;
-
-class function TBase.GetOptimalBitsCount2(CharsCount: LongWord;
-  out charsCountInBits: LongWord; maxBitsCount: LongWord = 64;
-  base2BitsCount: Boolean = False): Integer;
-
-var
-  n, n1: Integer;
-  charsCountLog, ratio, maxRatio, temp, multemp, dCharsCount, d2: Double;
-  l1: LongWord;
-begin
-  result := 0;
-  charsCountInBits := 0;
-  n1 := LogBase2(CharsCount);
-  dCharsCount := (CharsCount * 1.0);
-  d2 := (2 * 1.0);
-  charsCountLog := LogN(dCharsCount, d2);
-  maxRatio := 0;
-
-  for n := n1 to maxBitsCount do
-
-  begin
-
-    if ((Ord(base2BitsCount) and (n mod 8)) <> 0) then
-      continue;
-    temp := n * charsCountLog;
-    l1 := UInt32(Ceil(temp));
-
-    multemp := (n * 1.0);
-
-    ratio := multemp / l1;
-
-    if (ratio > maxRatio) then
-    begin
-      maxRatio := ratio;
-      result := n;
-      charsCountInBits := l1;
-    end;
-
-  end;
-
 end;
 
 end.

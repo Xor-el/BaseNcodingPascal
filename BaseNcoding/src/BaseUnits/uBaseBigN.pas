@@ -6,73 +6,43 @@ interface
 
 uses
 
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Math,
+  System.Math
 {$ELSE}
-  SysUtils,
-  Math,
+    SysUtils,
+  Math
 {$ENDIF}
 {$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-  System.Classes,
-  System.Threading,
+    , System.Classes,
+  System.Threading
 {$ENDIF}
-  IntegerX,
+    , IntegerX,
   uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
   uUtils;
 
 type
 
   TIntegerXArray = array of TIntegerX;
 
-  IBaseBigN = interface
-    ['{CEA46191-74D3-4354-AC89-A312E0758035}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-    function GetBlockMaxBitsCount: UInt32;
-    property BlockMaxBitsCount: UInt32 read GetBlockMaxBitsCount;
-    function GetReverseOrder: Boolean;
-    property ReverseOrder: Boolean read GetReverseOrder;
-    function GetMaxCompression: Boolean;
-    property MaxCompression: Boolean read GetMaxCompression;
-{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-    function GetParallel: Boolean;
-    procedure SetParallel(value: Boolean);
-    property Parallel: Boolean read GetParallel write SetParallel;
-{$ENDIF}
-  end;
-
-  TBaseBigN = class(TBase, IBaseBigN)
+  TBaseBigN = class sealed(TBase, IBaseBigN)
 
   strict private
+
+    FBlockMaxBitsCount: UInt32;
+    FReverseOrder, FMaxCompression: Boolean;
+    F_powN: TIntegerXArray;
+
+    class var
+
+      Ftwo_in_power_n: TBytes;
 
     procedure EncodeBlock(src: TBytes; dst: TBaseNcodingCharArray;
       beginInd, endInd, _blockBitsCount, _blockCharsCount: Integer);
     procedure DecodeBlock(const src: TBaseNcodingString; dst: TBytes;
       beginInd, endInd, _blockBitsCount, _blockCharsCount: Integer);
-
-  protected
 
     procedure BitsToChars(chars: TBaseNcodingCharArray; ind, count: Integer;
       block: TIntegerX);
@@ -89,16 +59,7 @@ type
     function GetMaxCompression: Boolean;
     procedure SetMaxCompression(value: Boolean);
 
-  protected
-
-    // class var
-    FBlockMaxBitsCount: UInt32;
-    FReverseOrder, FMaxCompression: Boolean;
-    F_powN: TIntegerXArray;
-
-    class var
-
-      Ftwo_in_power_n: TBytes;
+    class constructor CreateBaseBigNState();
 
   public
 
@@ -108,17 +69,6 @@ type
 {$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
       _parallel: Boolean = False; {$ENDIF}
       _maxCompression: Boolean = False);
-
-    /// <summary>
-    /// Since Delphi 2009 does not support Static class constructors, I decided
-    /// to use a normal method and call it on the initialization section of the unit.
-    /// </summary>
-
-  private
-
-    class procedure CreateBaseBigNState(); static;
-
-  public
 
     function GetHaveSpecial: Boolean; override;
     function Encode(data: TBytes): TBaseNcodingString; override;
@@ -140,14 +90,14 @@ constructor TBaseBigN.Create(const _Alphabet: TBaseNcodingString;
   _parallel: Boolean = False; {$ENDIF}
   _maxCompression: Boolean = False);
 var
-  charsCountInBits: LongWord;
+  charsCountInBits: UInt32;
 
 begin
   Inherited Create(UInt32(Length(_Alphabet)), _Alphabet, TBaseNcodingChar(0),
     _Encoding{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}, _parallel{$ENDIF});
   BlockMaxBitsCount := _blockMaxBitsCount;
 
-  BlockBitsCount := GetOptimalBitsCount(CharsCount, charsCountInBits,
+  BlockBitsCount := TUtils.GetOptimalBitsCount(CharsCount, charsCountInBits,
     BlockMaxBitsCount, 2);
   BlockCharsCount := Integer(charsCountInBits);
 
@@ -156,7 +106,7 @@ begin
   MaxCompression := _maxCompression;
 end;
 
-class procedure TBaseBigN.CreateBaseBigNState();
+class constructor TBaseBigN.CreateBaseBigNState();
 var
   a, i: Integer;
 
@@ -188,9 +138,10 @@ var
   dLengthAlphabet, d2, tempD: Double;
 
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   if (not MaxCompression) then
@@ -262,10 +213,10 @@ var
   dLengthAlphabet, d2, tempD, tempD2: Double;
 
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;
@@ -562,9 +513,5 @@ procedure TBaseBigN.SetMaxCompression(value: Boolean);
 begin
   FMaxCompression := value;
 end;
-
-initialization
-
-TBaseBigN.CreateBaseBigNState();
 
 end.

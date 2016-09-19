@@ -1,11 +1,15 @@
 unit BaseTests;
 
 {$mode delphiunicode}
+{$HINTS OFF}
 
 interface
 
 uses
-  Classes, SysUtils, testregistry, uBase;
+  Classes,
+  SysUtils,
+  testregistry,
+  uIBaseInterfaces;
 
 type
 

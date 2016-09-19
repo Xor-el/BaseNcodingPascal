@@ -6,54 +6,28 @@ interface
 
 uses
 
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
-  System.SysUtils,
+  System.SysUtils
 {$ELSE}
-  SysUtils,
+    SysUtils
 {$ENDIF}
-  uBase,
-  uUtils
 {$IFDEF FPC}
     , fgl
-{$ENDIF};
+{$ENDIF}
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
 
-  IBase1024 = interface
-    ['{4131E6DD-DAB7-4752-84D9-88B52E03CEF1}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-
-  end;
-
-  TBase1024 = class(TBase, IBase1024)
+  TBase1024 = class sealed(TBase, IBase1024)
 
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 1023] of TBaseNcodingChar = ('0', '1', '2',
+    DefaultAlphabet: array [0 .. 1023] of TBaseNcodingChar = ('0', '1', '2',
       '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
       'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W',
       'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -124,7 +98,7 @@ type
       'Յ', 'Ն', 'Շ', 'Ո', 'Չ', 'Պ', 'Ջ', 'Ռ', 'Ս', 'Վ', 'Տ', 'Ր', 'Ց', 'Ւ',
       'Փ', 'Ք');
 
-    DefaultSpecial = '=';
+    DefaultSpecial = TBaseNcodingChar('=');
 
     constructor Create(_Alphabet: TBaseNcodingString = '';
       _Special: TBaseNcodingChar = DefaultSpecial;
@@ -164,9 +138,10 @@ var
   uS: TBaseNcodingString;
 {$ENDIF}
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   dataLength := Length(data);
@@ -293,10 +268,10 @@ var
   lastSpecialInd, tailLength, i, srcInd, x1, x2, x3, x4, length5: Integer;
 
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

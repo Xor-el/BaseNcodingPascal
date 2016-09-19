@@ -6,62 +6,36 @@ interface
 
 uses
 
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Classes,
+  System.Classes
 {$ELSE}
-  SysUtils,
-  Classes,
+    SysUtils,
+  Classes
 {$ENDIF}
 {$IFDEF FPC}
-  fgl,
+    , fgl
 {$ELSE}
 {$IFDEF SCOPEDUNITNAMES}
-  System.Generics.Collections,
+    , System.Generics.Collections
 {$ELSE}
-  Generics.Collections,
+    , Generics.Collections
 {$ENDIF}
 {$ENDIF}
-  uBase,
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
   uUtils;
 
 type
 
-  IBase91 = interface
-    ['{5BB3F4C5-0806-4E89-ACA0-84EDB0C8F959}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-
-  end;
-
-  TBase91 = class(TBase, IBase91)
+  TBase91 = class sealed(TBase, IBase91)
 
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 90] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
+    DefaultAlphabet: array [0 .. 90] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
       'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
       'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
@@ -112,15 +86,17 @@ var
   uC: TBaseNcodingChar;
 {$ENDIF}
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   dataLength := Length(data);
 
 {$IFDEF FPC}
   tempResult := TFPGList<TBaseNcodingChar>.Create;
+  tempResult.Capacity := dataLength;
 {$ELSE}
   tempResult := TStringBuilder.Create(dataLength);
 {$ENDIF}
@@ -205,10 +181,10 @@ var
 {$ENDIF};
 begin
 
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

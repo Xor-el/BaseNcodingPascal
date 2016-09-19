@@ -7,18 +7,18 @@ interface
 uses
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Math,
+  System.Math
 {$ELSE}
-  SysUtils,
-  Math,
+    SysUtils,
+  Math
 {$ENDIF}
 {$IFDEF FPC}
-  fgl
+    , fgl
 {$ELSE}
 {$IFDEF SCOPEDUNITNAMES}
-  System.Generics.Collections
+    , System.Generics.Collections
 {$ELSE}
-  Generics.Collections
+    , Generics.Collections
 {$ENDIF}
 {$ENDIF};
 
@@ -430,16 +430,9 @@ type
     /// </summary>
     FTrailingZerosTable: TBytes;
 
-    /// <summary>
-    /// Since Delphi 2009 does not support Static class constructors, I decided to use a normal method
-    /// and call it on the initialization section of the unit.
-    /// </summary>
-
-  private
-
-    class procedure CreateIntegerXState(); static;
-
   strict private
+
+    class constructor CreateIntegerXState();
 
   public
     /// <summary>
@@ -1463,7 +1456,7 @@ resourcestring
 
 implementation
 
-class procedure TIntegerX.CreateIntegerXState();
+class constructor TIntegerX.CreateIntegerXState();
 begin
   // Create a Zero TIntegerX (a big integer with value as Zero)
   ZeroX := TIntegerX.Create(0, Nil);
@@ -4617,9 +4610,5 @@ class function TIntegerX.GetNegativeOne: TIntegerX;
 begin
   result := NegativeOneX;
 end;
-
-initialization
-
-TIntegerX.CreateIntegerXState();
 
 end.

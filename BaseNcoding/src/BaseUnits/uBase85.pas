@@ -5,61 +5,37 @@ unit uBase85;
 interface
 
 uses
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Classes,
+  System.Classes
 {$ELSE}
-  SysUtils,
-  Classes,
+    SysUtils,
+  Classes
 {$ENDIF}
-  uBase,
-  uUtils
 {$IFDEF FPC}
     , fgl
-{$ENDIF};
+{$ENDIF}
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
+
+resourcestring
+
+  SInvalidBlock = 'The last block of ASCII85 data cannot be a single byte.';
+  SInvalidData =
+    'ASCII85 encoded data should begin with "%s" and end with "%s"';
 
 type
 
-  IBase85 = interface
-    ['{A230687D-2037-482C-B207-E543683B5ED4}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-    function GetPrefixPostfix: Boolean;
-    procedure SetPrefixPostfix(value: Boolean);
-    property PrefixPostfix: Boolean read GetPrefixPostfix
-      write SetPrefixPostfix;
-
-  end;
-
-  TBase85 = class(TBase, IBase85)
-
-  protected
-
-    function GetPrefixPostfix: Boolean;
-    procedure SetPrefixPostfix(value: Boolean);
+  TBase85 = class sealed(TBase, IBase85)
 
   strict private
+
+    FPrefixPostfix: Boolean;
+
+    function GetPrefixPostfix: Boolean;
+    procedure SetPrefixPostfix(value: Boolean);
 
     procedure EncodeBlock(count: Integer; var sb:
 {$IFDEF FPC} TFPGList<TBaseNcodingString>
@@ -67,17 +43,11 @@ type
 {$ENDIF}; encodedBlock: TBytes; tuple: UInt32);
     procedure DecodeBlock(bytes: Integer; decodedBlock: TBytes; tuple: UInt32);
 
-  protected
-
-    // class var
-
-    FPrefixPostfix: Boolean;
-
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 84] of TBaseNcodingChar = ('!', '"', '#', '$',
+    DefaultAlphabet: array [0 .. 84] of TBaseNcodingChar = ('!', '"', '#', '$',
       '%', '&', '''', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2',
       '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A',
       'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -86,11 +56,12 @@ type
       'o', 'p', 'q', 'r', 's', 't', 'u');
 
     DefaultSpecial = TBaseNcodingChar(0);
-    Pow85: Array [0 .. 4] of UInt32 = (85 * 85 * 85 * 85, 85 * 85 * 85,
+
+    Pow85: array [0 .. 4] of UInt32 = (85 * 85 * 85 * 85, 85 * 85 * 85,
       85 * 85, 85, 1);
 
-    Prefix = '<~';
-    Postfix = '~>';
+    Prefix = TBaseNcodingString('<~');
+    Postfix = TBaseNcodingString('~>');
 
     constructor Create(_Alphabet: TBaseNcodingString = '';
       _Special: TBaseNcodingChar = DefaultSpecial;
@@ -155,6 +126,12 @@ var
   temp: Double;
 
 begin
+  if ((data = Nil) or (Length(data) = 0)) then
+  begin
+    result := ('');
+    Exit;
+  end;
+
   SetLength(encodedBlock, 5);
   decodedBlockLength := 4;
   temp := Length(data) * (Length(encodedBlock) / decodedBlockLength);
@@ -244,16 +221,16 @@ var
   ms: TMemoryStream;
   count, encodedBlockLength, i, Idx: Integer;
   processChar: Boolean;
-  tuple: LongWord;
+  tuple: UInt32;
   decodedBlock: TBytes;
   c: TBaseNcodingChar;
 
 begin
 
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;
@@ -263,9 +240,7 @@ begin
     if not(TUtils.StartsWith(dataWithoutPrefixPostfix, Prefix) or
       TUtils.EndsWith(dataWithoutPrefixPostfix, Postfix)) then
     begin
-      raise Exception.Create
-        (Format('ASCII85 encoded data should begin with "%s" and end with "%s"',
-        [Prefix, Postfix]));
+      raise Exception.CreateResFmt(@SInvalidData, [Prefix, Postfix]);
     end;
 
     dataWithoutPrefixPostfix := Copy(dataWithoutPrefixPostfix,
@@ -337,8 +312,7 @@ begin
 
       if (count = 1) then
       begin
-        raise Exception.Create
-          ('The last block of ASCII85 data cannot be a single byte.');
+        raise Exception.CreateRes(@SInvalidBlock);
       end;
       dec(count);
       tuple := tuple + Pow85[count];
@@ -396,7 +370,7 @@ begin
 end;
 
 procedure TBase85.DecodeBlock(bytes: Integer; decodedBlock: TBytes;
-  tuple: LongWord);
+  tuple: UInt32);
 var
   i: Integer;
 

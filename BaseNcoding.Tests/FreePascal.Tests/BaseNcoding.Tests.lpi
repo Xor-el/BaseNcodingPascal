@@ -24,7 +24,7 @@
           <PathDelim Value="\"/>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="src;..\..\BaseNcoding\src\BaseUnits;..\..\BaseNcoding\src\UtilityUnits"/>
+            <OtherUnitFiles Value="src;..\..\BaseNcoding\src\BaseUnits;..\..\BaseNcoding\src\UtilityUnits;..\..\BaseNcoding\src\BaseInterfaces"/>
           </SearchPaths>
           <Parsing>
             <SyntaxOptions>
@@ -54,7 +54,7 @@
           <PathDelim Value="\"/>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="src;..\..\BaseNcoding\src\BaseUnits;..\..\BaseNcoding\src\UtilityUnits"/>
+            <OtherUnitFiles Value="src;..\..\BaseNcoding\src\BaseUnits;..\..\BaseNcoding\src\UtilityUnits;..\..\BaseNcoding\src\BaseInterfaces"/>
           </SearchPaths>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
@@ -90,7 +90,7 @@
         <PackageName Value="FCL"/>
       </Item3>
     </RequiredPackages>
-    <Units Count="27">
+    <Units Count="29">
       <Unit0>
         <Filename Value="BaseNcoding.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -200,6 +200,14 @@
         <Filename Value="..\..\BaseNcoding\src\UtilityUnits\uBaseNcodingTypes.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit26>
+      <Unit27>
+        <Filename Value="..\..\BaseNcoding\src\BaseInterfaces\uIBaseInterfaces.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit27>
+      <Unit28>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBaseFactory.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit28>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -207,7 +215,7 @@
     <PathDelim Value="\"/>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="src;..\..\BaseNcoding\src\BaseUnits;..\..\BaseNcoding\src\UtilityUnits"/>
+      <OtherUnitFiles Value="src;..\..\BaseNcoding\src\BaseUnits;..\..\BaseNcoding\src\UtilityUnits;..\..\BaseNcoding\src\BaseInterfaces"/>
     </SearchPaths>
   </CompilerOptions>
   <Debugging>

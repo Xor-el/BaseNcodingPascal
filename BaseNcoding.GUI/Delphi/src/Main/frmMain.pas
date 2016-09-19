@@ -50,6 +50,7 @@ uses
   uZBase32,
   uBaseN,
   uBaseBigN,
+  uIBaseInterfaces,
   uStringGenerator,
   uUtils;
 
@@ -157,9 +158,9 @@ var
   tempInt, tempInt2: Integer;
   tempDouble: Double;
   special: Char;
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
   parallel: Boolean;
-{$IFEND}
+{$ENDIF}
 begin
   method := Nil;
   alphabet := mAlphabet.Text;
@@ -219,9 +220,9 @@ begin
   else
     FtextEncoding := Nil;
 
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
   parallel := cbParallel.Checked;
-{$IFEND}
+{$ENDIF}
   tempStr := cmbMethod.Items[cmbMethod.ItemIndex];
   tempInt := AnsiIndexStr(tempStr, ['Base32', 'Base64', 'Base128', 'Base256',
     'Base1024', 'Base4096', 'ZBase32', 'Base85', 'Base91', 'BaseN',
@@ -237,8 +238,7 @@ begin
     1:
       begin
         method := TBase64.Create(alphabet, special,
-          FtextEncoding{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)},
-          parallel{$IFEND});
+          FtextEncoding{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}, parallel{$ENDIF});
       end;
 
     2:
@@ -281,16 +281,16 @@ begin
       begin
         method := TBaseN.Create(alphabet, UInt32(speMaxBitsCount.Value),
           FtextEncoding,
-          cbReverseOrder.Checked{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)},
-          parallel{$IFEND});
+          cbReverseOrder.Checked{$IFDEF SUPPORT_PARALLEL_PROGRAMMING},
+          parallel{$ENDIF});
       end;
 
     10:
       begin
         method := TBaseBigN.Create(alphabet, UInt32(speMaxBitsCount.Value),
           FtextEncoding, cbReverseOrder.Checked,
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
-          parallel, {$IFEND} cbMaxCompression.Checked);
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
+          parallel, {$ENDIF} cbMaxCompression.Checked);
       end;
 
   end;
@@ -428,13 +428,13 @@ begin
   begin
     cbPrefixPostfix.Checked := false;
   end;
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
   cbParallel.Enabled := false;
   if (not(cmbMethod.ItemIndex in [1, 9, 10])) then
   begin
     cbParallel.Checked := false;
   end;
-{$IFEND}
+{$ENDIF}
   speAlphabetLength.Enabled := false;
   speMaxBitsCount.Enabled := false;
   tempStr := cmbMethod.Items[cmbMethod.ItemIndex];
@@ -452,9 +452,9 @@ begin
 
     1:
       begin
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
         cbParallel.Enabled := True;
-{$IFEND}
+{$ENDIF}
         mAlphabet.Text := TBase64.DefaultAlphabet;
         tbSpecialChar.Text := TBase64.DefaultSpecial;
       end;
@@ -504,9 +504,9 @@ begin
 
     9 .. 10:
       begin
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
         cbParallel.Enabled := True;
-{$IFEND}
+{$ENDIF}
         mAlphabet.Text := TStringGenerator.GetAlphabet
           (Integer(speAlphabetLength.Value));
         tbSpecialChar.Text := '';
@@ -668,10 +668,10 @@ begin
       'DefaultGeneratingTextCharCount', 3000);
     cbOnlyLettersAndDigits.Checked := FSettings.ReadBool('Settings',
       'DefaultGenerateOnlyLettersAndDigits', True);
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     cbParallel.Checked := FSettings.ReadBool('Settings',
       'DefaultParallel', false);
-{$IFEND}
+{$ENDIF}
     speMaxBitsCount.Value := FSettings.ReadInteger('Settings',
       'DefaultMaxBitsCount', 64);
     cbReverseOrder.Checked := FSettings.ReadBool('Settings',
@@ -717,9 +717,9 @@ begin
       Integer(speGeneratingTextCharCount.Value));
     FSettings.WriteBool('Settings', 'DefaultGenerateOnlyLettersAndDigits',
       cbOnlyLettersAndDigits.Checked);
-{$IF DEFINED (SUPPORT_PARALLEL_PROGRAMMING)}
+{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
     FSettings.WriteBool('Settings', 'DefaultParallel', cbParallel.Checked);
-{$IFEND}
+{$ENDIF}
     FSettings.WriteInteger('Settings', 'DefaultMaxBitsCount',
       Integer(speMaxBitsCount.Value));
     FSettings.WriteBool('Settings', 'DefaultReverseOrder',

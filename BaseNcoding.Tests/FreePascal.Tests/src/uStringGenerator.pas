@@ -5,7 +5,8 @@ unit uStringGenerator;
 interface
 
 uses
-  SysUtils, Math;
+  SysUtils,
+  Math;
 
 type
 

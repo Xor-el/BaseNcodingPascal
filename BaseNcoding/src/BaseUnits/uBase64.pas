@@ -7,66 +7,43 @@ interface
 uses
 
 {$IFDEF SCOPEDUNITNAMES}
-  System.SysUtils,
+  System.SysUtils
 {$ELSE}
-  SysUtils,
+    SysUtils
 {$ENDIF}
 {$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-  System.Classes,
+    , System.Classes,
   System.Threading,
-  System.Math,
+  System.Math
 {$ENDIF}
-  uBase,
-  uUtils,
-  uBaseNcodingTypes;
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
 
-  IBase64 = interface
-    ['{E57BB251-9048-4287-9782-F22B12602B12}']
+  TBase64 = class sealed(TBase, IBase64)
 
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-    function GetParallel: Boolean;
-    procedure SetParallel(value: Boolean);
-    property Parallel: Boolean read GetParallel write SetParallel;
-{$ENDIF}
-  end;
+  strict private
 
-  TBase64 = class(TBase, IBase64)
+    procedure EncodeBlock(src: TBytes; dst: TBaseNcodingCharArray;
+      beginInd, endInd: Integer);
+    procedure DecodeBlock(const src: TBaseNcodingString; dst: TBytes;
+      beginInd, endInd: Integer);
 
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 63] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
+    DefaultAlphabet: array [0 .. 63] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
       'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
       'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
       'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
       '+', '/');
 
-    DefaultSpecial = '=';
+    DefaultSpecial = TBaseNcodingChar('=');
 
     constructor Create(_Alphabet: TBaseNcodingString = '';
       _Special: TBaseNcodingChar = DefaultSpecial;
@@ -77,13 +54,6 @@ type
     function GetHaveSpecial: Boolean; override;
     function Encode(data: TBytes): TBaseNcodingString; override;
     function Decode(const data: TBaseNcodingString): TBytes; override;
-
-  strict private
-
-    procedure EncodeBlock(src: TBytes; dst: TBaseNcodingCharArray;
-      beginInd, endInd: Integer);
-    procedure DecodeBlock(const src: TBaseNcodingString; dst: TBytes;
-      beginInd, endInd: Integer);
 
   end;
 
@@ -119,7 +89,8 @@ var
 begin
   if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   dataLength := Length(data);
@@ -211,10 +182,10 @@ var
   tempResult: TBytes;
 
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

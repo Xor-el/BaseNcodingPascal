@@ -5,55 +5,28 @@ unit uBase128;
 interface
 
 uses
-
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
-  System.SysUtils,
+  System.SysUtils
 {$ELSE}
-  SysUtils,
+    SysUtils
 {$ENDIF}
-  uBase,
-  uUtils
 {$IFDEF FPC}
     , fgl
-{$ENDIF};
+{$ENDIF}
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
 
-  IBase128 = interface
-    ['{15410119-518E-4E56-A9AC-0093564B517F}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-
-  end;
-
-  TBase128 = class(TBase, IBase128)
+  TBase128 = class sealed(TBase, IBase128)
 
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 127] of TBaseNcodingChar = ('!', '#', '$', '%',
+    DefaultAlphabet: array [0 .. 127] of TBaseNcodingChar = ('!', '#', '$', '%',
       '(', ')', '*', ',', '.', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
       ':', ';', '-', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
       'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -63,7 +36,8 @@ type
       '¬', '®', '¯', '°', '±', '²', '³', '´', 'µ', '¶', '·', '¸', '¹', 'º', '»',
       '¼', '½', '¾', '¿', 'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê',
       'Ë', 'Ì', 'Í', 'Î');
-    DefaultSpecial = '=';
+
+    DefaultSpecial = TBaseNcodingChar('=');
 
     constructor Create(_Alphabet: TBaseNcodingString = '';
       _Special: TBaseNcodingChar = DefaultSpecial;
@@ -105,9 +79,10 @@ var
   x1, x2: Byte;
 
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   dataLength := Length(data);
@@ -360,10 +335,10 @@ function TBase128.Decode(const data: TBaseNcodingString): TBytes;
 var
   lastSpecialInd, tailLength, x1, x2, length7, i, srcInd: Integer;
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

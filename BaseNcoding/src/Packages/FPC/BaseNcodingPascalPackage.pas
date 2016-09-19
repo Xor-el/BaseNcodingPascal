@@ -8,7 +8,8 @@ interface
 
 uses
   uBase, uBase32, uBase64, uBase85, uBase91, uBase128, uBase256, uBase1024, 
-  uBase4096, uBaseBigN, uBaseN, uZBase32, uBaseNcodingTypes, IntegerX, uUtils;
+  uBase4096, uBaseBigN, uBaseN, uZBase32, uBaseNcodingTypes, IntegerX, uUtils, 
+  uBaseFactory, uIBaseInterfaces;
 
 implementation
 

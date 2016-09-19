@@ -6,53 +6,28 @@ interface
 
 uses
 
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
-  System.SysUtils,
+  System.SysUtils
 {$ELSE}
-  SysUtils,
+    SysUtils
 {$ENDIF}
-  uBase,
-  uUtils
 {$IFDEF FPC}
     , fgl
-{$ENDIF};
+{$ENDIF}
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
-  IBase256 = interface
-    ['{66F55DDE-FC44-4BDC-93C7-94956212B66B}']
 
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-
-  end;
-
-  TBase256 = class(TBase, IBase256)
+  TBase256 = class sealed(TBase, IBase256)
 
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 255] of TBaseNcodingChar = ('!', '#', '$', '%',
+    DefaultAlphabet: array [0 .. 255] of TBaseNcodingChar = ('!', '#', '$', '%',
       '&', '''', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3',
       '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B',
       'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
@@ -111,9 +86,10 @@ var
   uC: TBaseNcodingChar;
 {$ENDIF}
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
 {$IFDEF FPC}
@@ -153,10 +129,10 @@ function TBase256.Decode(const data: TBaseNcodingString): TBytes;
 var
   i: Integer;
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

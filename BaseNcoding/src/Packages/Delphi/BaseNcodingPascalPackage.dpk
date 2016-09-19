@@ -46,6 +46,8 @@ contains
   uBaseBigN in '..\..\BaseUnits\uBaseBigN.pas',
   uBaseN in '..\..\BaseUnits\uBaseN.pas',
   uZBase32 in '..\..\BaseUnits\uZBase32.pas',
+  uBaseFactory in '..\..\BaseUnits\uBaseFactory.pas',
+  uIBaseInterfaces in '..\..\BaseInterfaces\uIBaseInterfaces.pas',
   IntegerX in '..\..\UtilityUnits\IntegerX.pas',
   uBaseNcodingTypes in '..\..\UtilityUnits\uBaseNcodingTypes.pas',
   uUtils in '..\..\UtilityUnits\uUtils.pas';

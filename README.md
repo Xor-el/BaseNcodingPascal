@@ -70,8 +70,8 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
         go out of scope).
 
     6. If you are working with FreePascal in which the String and Char types are Mapped 
-       to "AnsiString" and "AnsiChar" by Default, you could "remap" them to "WideString" 
-       and "WideChar" by declaring "{$mode delphiunicode}" at the top of your unit 
+       to "AnsiString" and "AnsiChar" by Default, you could "remap" them to "UnicodeString" 
+       and "UnicodeChar" by declaring "{$mode delphiunicode}" at the top of your unit 
        excluding the ("") symbols.
 
     
@@ -88,7 +88,7 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 ```pascal
      // Here is a Little Snippet showing Usage for Base32 Operations.  
     uses
-      SysUtils, uBase32;
+      SysUtils, uBase32, uBaseFactory;
 
       procedure TForm1.Button1Click(Sender: TObject);
 	var
@@ -116,6 +116,8 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 	  BaseSpecial := B32.Special;
 	 // There are some other important properties but those are left for you to figure out. :)
 	 // Also no need to "Free" the Created Instance Since it is Reference Counted.
+	// or for a simple one-liner to Base32 Encode a String
+	  TBaseFactory.CreateBase32().EncodeString('Fish');
     end;
 ```    
   

@@ -8,65 +8,33 @@ uses
 
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Math,
+  System.Math
 {$ELSE}
-  SysUtils,
-  Math,
+    SysUtils,
+  Math
 {$ENDIF}
 {$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-  System.Classes,
-  System.Threading,
+    , System.Classes,
+  System.Threading
 {$ENDIF}
-  uBase,
-  uUtils,
-  uBaseNcodingTypes;
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
 
-  IBaseN = interface
-    ['{5D0520CF-2A5A-4B3F-9263-7C2F1F822E8B}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-    function GetBlockMaxBitsCount: UInt32;
-    property BlockMaxBitsCount: UInt32 read GetBlockMaxBitsCount;
-    function GetReverseOrder: Boolean;
-    property ReverseOrder: Boolean read GetReverseOrder;
-{$IFDEF SUPPORT_PARALLEL_PROGRAMMING}
-    function GetParallel: Boolean;
-    procedure SetParallel(value: Boolean);
-    property Parallel: Boolean read GetParallel write SetParallel;
-{$ENDIF}
-  end;
-
-  TBaseN = class(TBase, IBaseN)
+  TBaseN = class sealed(TBase, IBaseN)
 
   strict private
+    FBlockMaxBitsCount: UInt32;
+    FReverseOrder: Boolean;
+    F_powN: TBaseNcodingUInt64Array;
+
     procedure EncodeBlock(src: TBytes; dst: TBaseNcodingCharArray;
       beginInd, endInd: Integer);
     procedure DecodeBlock(const src: TBaseNcodingString; dst: TBytes;
       beginInd, endInd: Integer);
-
-  protected
 
     procedure BitsToChars(chars: TBaseNcodingCharArray; ind, count: Integer;
       block: UInt64);
@@ -79,13 +47,6 @@ type
     procedure SetBlockMaxBitsCount(value: UInt32);
     function GetReverseOrder: Boolean;
     procedure SetReverseOrder(value: Boolean);
-
-  protected
-
-    // class var
-    FBlockMaxBitsCount: UInt32;
-    FReverseOrder: Boolean;
-    F_powN: TBaseNcodingUInt64Array;
 
   public
 
@@ -112,7 +73,7 @@ constructor TBaseN.Create(const _Alphabet: TBaseNcodingString;
   ; _parallel: Boolean = False
 {$ENDIF});
 var
-  charsCountInBits: LongWord;
+  charsCountInBits: UInt32;
   pow: UInt64;
   i: Integer;
 begin
@@ -121,7 +82,7 @@ begin
 
   BlockMaxBitsCount := _blockMaxBitsCount;
 
-  BlockBitsCount := GetOptimalBitsCount(CharsCount, charsCountInBits,
+  BlockBitsCount := TUtils.GetOptimalBitsCount(CharsCount, charsCountInBits,
     _blockMaxBitsCount);
   BlockCharsCount := Integer(charsCountInBits);
 
@@ -154,9 +115,10 @@ var
   tempResult: TBaseNcodingCharArray;
 
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   mainBitsLength := (Length(data) * 8 div BlockBitsCount) * BlockBitsCount;
@@ -212,10 +174,10 @@ var
   tempResult: TBytes;
 
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

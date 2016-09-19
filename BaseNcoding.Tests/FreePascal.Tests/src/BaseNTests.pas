@@ -1,12 +1,26 @@
 unit BaseNTests;
 
 {$mode delphiunicode}
+{$WARNINGS OFF}
+{$HINTS OFF}
 
 interface
 
 uses
-  Classes, SysUtils, Math, fpcunit, testregistry, fgl,
-  Base64, BaseTests, uBase64, uBaseN, uBaseBigN, uStringGenerator;
+  Classes,
+  SysUtils,
+  Math,
+  fpcunit,
+  testregistry,
+  fgl,
+  Base64,
+  BaseTests,
+  uBase64,
+  uBaseN,
+  uBaseBigN,
+  uUtils,
+  uIBaseInterfaces,
+  uStringGenerator;
 
 type
 
@@ -63,16 +77,16 @@ var
   builder: string;
 
 begin
-  CheckEquals(5, TBaseN.GetOptimalBitsCount2(32, charsCountInBits));
-  CheckEquals(6, TBaseN.GetOptimalBitsCount2(64, charsCountInBits));
-  CheckEquals(32, TBaseN.GetOptimalBitsCount2(85, charsCountInBits));
-  CheckEquals(13, TBaseN.GetOptimalBitsCount2(91, charsCountInBits));
+  CheckEquals(5, TUtils.GetOptimalBitsCount2(32, charsCountInBits));
+  CheckEquals(6, TUtils.GetOptimalBitsCount2(64, charsCountInBits));
+  CheckEquals(32, TUtils.GetOptimalBitsCount2(85, charsCountInBits));
+  CheckEquals(13, TUtils.GetOptimalBitsCount2(91, charsCountInBits));
 
 
   builder := '';
   for i := 2 to 256 do
   begin
-    bits := TBaseBigN.GetOptimalBitsCount2(UInt32(i), charsCountInBits, 512);
+    bits := TUtils.GetOptimalBitsCount2(UInt32(i), charsCountInBits, 512);
     tempDouble := (bits * 1.0);
     ratio := tempDouble / charsCountInBits;
 
@@ -210,7 +224,7 @@ begin
         end;
         encoded := baseN.Encode(_array);
         decoded := baseN.Decode(encoded);
-        CheckEquals(CompareMem(Pointer(_array), Pointer(decoded), Length(_array) * SizeOf(Byte)), True);
+        CheckEquals(True, CompareMem(Pointer(_array), Pointer(decoded), Length(_array) * SizeOf(Byte)));
         bytes.Add(testByte);
         bytes.Add(testByte);
         Inc(i);

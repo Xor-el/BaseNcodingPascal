@@ -28,7 +28,7 @@ type
   /// </summary>
   TBaseNcodingCharArray = array of TBaseNcodingChar;
   /// <summary>
-  /// Represents a pointer to a "char".
+  /// alias for "pchar" (pointer to a char) type depending on the compiler.
   /// </summary>
   PBaseNcodingChar = {$IFDEF FPC} PUnicodeChar {$ELSE} PChar {$ENDIF};
 

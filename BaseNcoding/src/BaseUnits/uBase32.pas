@@ -6,57 +6,32 @@ interface
 
 uses
 
-  uBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
-  System.SysUtils,
+  System.SysUtils
 {$ELSE}
-  SysUtils,
+    SysUtils
 {$ENDIF}
-  uBase,
-  uUtils
 {$IFDEF FPC}
     , fgl
-{$ENDIF};
+{$ENDIF}
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
-  IBase32 = interface
-    ['{194EDF16-63BB-47AB-BF6A-F0E72B450F30}']
 
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-
-  end;
-
-  TBase32 = class(TBase, IBase32)
+  TBase32 = class sealed(TBase, IBase32)
 
   public
 
     const
 
-    DefaultAlphabet: Array [0 .. 31] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
+    DefaultAlphabet: array [0 .. 31] of TBaseNcodingChar = ('A', 'B', 'C', 'D',
       'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '2', '3', '4', '5', '6', '7');
 
-    DefaultSpecial = '=';
+    DefaultSpecial = TBaseNcodingChar('=');
 
     constructor Create(_Alphabet: TBaseNcodingString = '';
       _Special: TBaseNcodingChar = DefaultSpecial;
@@ -98,9 +73,10 @@ var
 {$ENDIF}
   x1, x2: Byte;
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   dataLength := Length(data);
@@ -280,10 +256,10 @@ var
     x8: Integer;
 
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;

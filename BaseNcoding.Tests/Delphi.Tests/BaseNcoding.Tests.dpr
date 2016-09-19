@@ -39,6 +39,9 @@ uses
   uBaseBigN in '..\..\BaseNcoding\src\BaseUnits\uBaseBigN.pas',
   uBaseN in '..\..\BaseNcoding\src\BaseUnits\uBaseN.pas',
   uZBase32 in '..\..\BaseNcoding\src\BaseUnits\uZBase32.pas',
+  uBaseFactory in '..\..\BaseNcoding\src\BaseUnits\uBaseFactory.pas',
+  uIBaseInterfaces
+    in '..\..\BaseNcoding\src\BaseInterfaces\uIBaseInterfaces.pas',
   uUtils in '..\..\BaseNcoding\src\UtilityUnits\uUtils.pas',
   uBaseNcodingTypes
     in '..\..\BaseNcoding\src\UtilityUnits\uBaseNcodingTypes.pas',

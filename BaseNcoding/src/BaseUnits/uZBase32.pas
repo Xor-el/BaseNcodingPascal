@@ -7,54 +7,28 @@ interface
 uses
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
-  System.Math,
+  System.Math
 {$ELSE}
-  SysUtils,
-  Math,
+    SysUtils,
+  Math
 {$ENDIF}
 {$IFDEF FPC}
-  fgl,
+    , fgl
 {$ELSE}
 {$IFDEF SCOPEDUNITNAMES}
-  System.Generics.Collections,
+    , System.Generics.Collections
 {$ELSE}
-  Generics.Collections,
+    , Generics.Collections
 {$ENDIF}
 {$ENDIF}
-  uBase,
-  uUtils,
-  uBaseNcodingTypes;
+    , uBase,
+  uIBaseInterfaces,
+  uBaseNcodingTypes,
+  uUtils;
 
 type
 
-  IZBase32 = interface
-    ['{96264326-C333-4642-A9C6-BDEA183E6597}']
-
-    function Encode(data: TBytes): TBaseNcodingString;
-    function Decode(const data: TBaseNcodingString): TBytes;
-    function EncodeString(const data: TBaseNcodingString): TBaseNcodingString;
-    function DecodeToString(const data: TBaseNcodingString): TBaseNcodingString;
-    function GetBitsPerChars: Double;
-    property BitsPerChars: Double read GetBitsPerChars;
-    function GetCharsCount: UInt32;
-    property CharsCount: UInt32 read GetCharsCount;
-    function GetBlockBitsCount: Integer;
-    property BlockBitsCount: Integer read GetBlockBitsCount;
-    function GetBlockCharsCount: Integer;
-    property BlockCharsCount: Integer read GetBlockCharsCount;
-    function GetAlphabet: TBaseNcodingString;
-    property Alphabet: TBaseNcodingString read GetAlphabet;
-    function GetSpecial: TBaseNcodingChar;
-    property Special: TBaseNcodingChar read GetSpecial;
-    function GetHaveSpecial: Boolean;
-    property HaveSpecial: Boolean read GetHaveSpecial;
-    function GetEncoding: TEncoding;
-    procedure SetEncoding(value: TEncoding);
-    property Encoding: TEncoding read GetEncoding write SetEncoding;
-
-  end;
-
-  TZBase32 = class(TBase, IZBase32)
+  TZBase32 = class sealed(TBase, IZBase32)
 
   strict private
 
@@ -65,7 +39,7 @@ type
 
     const
 
-    DefaultAlphabet: Array [0 .. 31] of TBaseNcodingChar = ('y', 'b', 'n', 'd',
+    DefaultAlphabet: array [0 .. 31] of TBaseNcodingChar = ('y', 'b', 'n', 'd',
       'r', 'f', 'g', '8', 'e', 'j', 'k', 'm', 'c', 'p', 'q', 'x', 'o', 't', '1',
       'u', 'w', 'i', 's', 'z', 'a', '3', '4', '5', 'h', '7', '6', '9');
 
@@ -152,9 +126,10 @@ var
   buffer: UInt64;
   temp: Double;
 begin
-  if ((data = nil) or (Length(data) = 0)) then
+  if ((data = Nil) or (Length(data) = 0)) then
   begin
-    Exit('');
+    result := ('');
+    Exit;
   end;
 
   dataLength := Length(data);
@@ -230,10 +205,10 @@ var
   tempResult: TList<Byte>
 {$ENDIF};
 begin
-  if TUtils.isNullOrEmpty(data) then
+  if TUtils.IsNullOrEmpty(data) then
 
   begin
-    SetLength(result, 1);
+
     result := Nil;
     Exit;
   end;
