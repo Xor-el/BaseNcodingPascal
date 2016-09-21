@@ -1,4 +1,4 @@
-unit uBase85;
+unit BcpBase85;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -15,10 +15,10 @@ uses
 {$IFDEF FPC}
     , fgl
 {$ENDIF}
-    , uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 resourcestring
 

@@ -1,4 +1,4 @@
-unit uBaseBigN;
+unit BcpBaseBigN;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -17,11 +17,11 @@ uses
     , System.Classes,
   System.Threading
 {$ENDIF}
-    , IntegerX,
-  uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpIntegerX,
+  BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 type
 

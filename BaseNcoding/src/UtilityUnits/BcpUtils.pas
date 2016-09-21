@@ -1,4 +1,4 @@
-unit uUtils;
+unit BcpUtils;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -6,7 +6,7 @@ interface
 
 uses
 
-  uBaseNcodingTypes,
+  BcpBaseNcodingTypes,
 {$IFDEF SCOPEDUNITNAMES}
   System.SysUtils,
   System.Math;

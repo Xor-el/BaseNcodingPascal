@@ -101,59 +101,59 @@
         <IsPartOfProject Value="True"/>
       </Unit1>
       <Unit2>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase32.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase32.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase64.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase64.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit4>
       <Unit5>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase85.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase85.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit5>
       <Unit6>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase91.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase91.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit6>
       <Unit7>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase128.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase128.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase256.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase256.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit8>
       <Unit9>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase1024.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase1024.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit9>
       <Unit10>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBase4096.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBase4096.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBaseBigN.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBaseBigN.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBaseN.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBaseN.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit12>
       <Unit13>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uZBase32.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpZBase32.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit13>
       <Unit14>
-        <Filename Value="..\..\BaseNcoding\src\UtilityUnits\IntegerX.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\UtilityUnits\BcpIntegerX.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit14>
       <Unit15>
-        <Filename Value="..\..\BaseNcoding\src\UtilityUnits\uUtils.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\UtilityUnits\BcpUtils.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit15>
       <Unit16>
@@ -197,15 +197,15 @@
         <IsPartOfProject Value="True"/>
       </Unit25>
       <Unit26>
-        <Filename Value="..\..\BaseNcoding\src\UtilityUnits\uBaseNcodingTypes.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\UtilityUnits\BcpBaseNcodingTypes.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit26>
       <Unit27>
-        <Filename Value="..\..\BaseNcoding\src\BaseInterfaces\uIBaseInterfaces.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseInterfaces\BcpIBaseInterfaces.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit27>
       <Unit28>
-        <Filename Value="..\..\BaseNcoding\src\BaseUnits\uBaseFactory.pas"/>
+        <Filename Value="..\..\BaseNcoding\src\BaseUnits\BcpBaseFactory.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit28>
     </Units>

@@ -24,52 +24,52 @@
     <Version Major="1"/>
     <Files Count="19">
       <Item1>
-        <Filename Value="..\..\BaseUnits\uBase.pas"/>
-        <UnitName Value="uBase"/>
+        <Filename Value="..\..\BaseUnits\BcpBase.pas"/>
+        <UnitName Value="BcpBase"/>
       </Item1>
       <Item2>
-        <Filename Value="..\..\BaseUnits\uBase32.pas"/>
-        <UnitName Value="uBase32"/>
+        <Filename Value="..\..\BaseUnits\BcpBase32.pas"/>
+        <UnitName Value="BcpBase32"/>
       </Item2>
       <Item3>
-        <Filename Value="..\..\BaseUnits\uBase64.pas"/>
-        <UnitName Value="uBase64"/>
+        <Filename Value="..\..\BaseUnits\BcpBase64.pas"/>
+        <UnitName Value="BcpBase64"/>
       </Item3>
       <Item4>
-        <Filename Value="..\..\BaseUnits\uBase85.pas"/>
-        <UnitName Value="uBase85"/>
+        <Filename Value="..\..\BaseUnits\BcpBase85.pas"/>
+        <UnitName Value="BcpBase85"/>
       </Item4>
       <Item5>
-        <Filename Value="..\..\BaseUnits\uBase91.pas"/>
-        <UnitName Value="uBase91"/>
+        <Filename Value="..\..\BaseUnits\BcpBase91.pas"/>
+        <UnitName Value="BcpBase91"/>
       </Item5>
       <Item6>
-        <Filename Value="..\..\BaseUnits\uBase128.pas"/>
-        <UnitName Value="uBase128"/>
+        <Filename Value="..\..\BaseUnits\BcpBase128.pas"/>
+        <UnitName Value="BcpBase128"/>
       </Item6>
       <Item7>
-        <Filename Value="..\..\BaseUnits\uBase256.pas"/>
-        <UnitName Value="uBase256"/>
+        <Filename Value="..\..\BaseUnits\BcpBase256.pas"/>
+        <UnitName Value="BcpBase256"/>
       </Item7>
       <Item8>
-        <Filename Value="..\..\BaseUnits\uBase1024.pas"/>
-        <UnitName Value="uBase1024"/>
+        <Filename Value="..\..\BaseUnits\BcpBase1024.pas"/>
+        <UnitName Value="BcpBase1024"/>
       </Item8>
       <Item9>
-        <Filename Value="..\..\BaseUnits\uBase4096.pas"/>
-        <UnitName Value="uBase4096"/>
+        <Filename Value="..\..\BaseUnits\BcpBase4096.pas"/>
+        <UnitName Value="BcpBase4096"/>
       </Item9>
       <Item10>
-        <Filename Value="..\..\BaseUnits\uBaseBigN.pas"/>
-        <UnitName Value="uBaseBigN"/>
+        <Filename Value="..\..\BaseUnits\BcpBaseBigN.pas"/>
+        <UnitName Value="BcpBaseBigN"/>
       </Item10>
       <Item11>
-        <Filename Value="..\..\BaseUnits\uBaseN.pas"/>
-        <UnitName Value="uBaseN"/>
+        <Filename Value="..\..\BaseUnits\BcpBaseN.pas"/>
+        <UnitName Value="BcpBaseN"/>
       </Item11>
       <Item12>
-        <Filename Value="..\..\BaseUnits\uZBase32.pas"/>
-        <UnitName Value="uZBase32"/>
+        <Filename Value="..\..\BaseUnits\BcpZBase32.pas"/>
+        <UnitName Value="BcpZBase32"/>
       </Item12>
       <Item13>
         <Filename Value="..\..\Include\BaseNcoding.inc"/>
@@ -80,24 +80,24 @@
         <Type Value="Include"/>
       </Item14>
       <Item15>
-        <Filename Value="..\..\UtilityUnits\uBaseNcodingTypes.pas"/>
-        <UnitName Value="uBaseNcodingTypes"/>
+        <Filename Value="..\..\UtilityUnits\BcpBaseNcodingTypes.pas"/>
+        <UnitName Value="BcpBaseNcodingTypes"/>
       </Item15>
       <Item16>
-        <Filename Value="..\..\UtilityUnits\IntegerX.pas"/>
-        <UnitName Value="IntegerX"/>
+        <Filename Value="..\..\UtilityUnits\BcpIntegerX.pas"/>
+        <UnitName Value="BcpIntegerX"/>
       </Item16>
       <Item17>
-        <Filename Value="..\..\UtilityUnits\uUtils.pas"/>
-        <UnitName Value="uUtils"/>
+        <Filename Value="..\..\UtilityUnits\BcpUtils.pas"/>
+        <UnitName Value="BcpUtils"/>
       </Item17>
       <Item18>
-        <Filename Value="..\..\BaseUnits\uBaseFactory.pas"/>
-        <UnitName Value="uBaseFactory"/>
+        <Filename Value="..\..\BaseUnits\BcpBaseFactory.pas"/>
+        <UnitName Value="BcpBaseFactory"/>
       </Item18>
       <Item19>
-        <Filename Value="..\..\BaseInterfaces\uIBaseInterfaces.pas"/>
-        <UnitName Value="uIBaseInterfaces"/>
+        <Filename Value="..\..\BaseInterfaces\BcpIBaseInterfaces.pas"/>
+        <UnitName Value="BcpIBaseInterfaces"/>
       </Item19>
     </Files>
     <RequiredPkgs Count="1">

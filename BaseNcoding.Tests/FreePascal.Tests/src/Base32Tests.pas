@@ -10,8 +10,8 @@ uses
   fpcunit,
   testregistry,
   BaseTests,
-  uBase32,
-  uUtils;
+  BcpBase32,
+  BcpUtils;
 
 type
 

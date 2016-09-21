@@ -15,8 +15,8 @@ uses
   SysUtils,
   TestFramework,
   BaseTests,
-  uBase1024,
-  uUtils;
+  BcpBase1024,
+  BcpUtils;
 
 type
   // Test methods for class TBase1024

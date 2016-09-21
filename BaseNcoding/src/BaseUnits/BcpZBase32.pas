@@ -1,4 +1,4 @@
-﻿unit uZBase32;
+﻿unit BcpZBase32;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -21,10 +21,10 @@ uses
     , Generics.Collections
 {$ENDIF}
 {$ENDIF}
-    , uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 type
 

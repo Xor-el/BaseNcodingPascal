@@ -1,4 +1,4 @@
-unit uBaseFactory;
+unit BcpBaseFactory;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -11,19 +11,19 @@ uses
 {$ELSE}
     SysUtils
 {$ENDIF}
-    , uBase32,
-  uBase64,
-  uBase85,
-  uBase91,
-  uBase128,
-  uBase256,
-  uBase1024,
-  uBase4096,
-  uZBase32,
-  uBaseN,
-  uBaseBigN,
-  uIBaseInterfaces,
-  uBaseNcodingTypes;
+    , BcpBase32,
+  BcpBase64,
+  BcpBase85,
+  BcpBase91,
+  BcpBase128,
+  BcpBase256,
+  BcpBase1024,
+  BcpBase4096,
+  BcpZBase32,
+  BcpBaseN,
+  BcpBaseBigN,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes;
 
 type
   TBaseFactory = class sealed(TObject)

@@ -1,4 +1,4 @@
-unit uBase;
+unit BcpBase;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -13,9 +13,9 @@ uses
     SysUtils,
   Math
 {$ENDIF}
-    , uUtils,
-  uIBaseInterfaces,
-  uBaseNcodingTypes;
+    , BcpUtils,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes;
 
 resourcestring
 

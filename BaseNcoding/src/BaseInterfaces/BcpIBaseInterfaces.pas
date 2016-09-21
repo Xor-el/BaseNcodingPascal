@@ -1,4 +1,4 @@
-unit uIBaseInterfaces;
+unit BcpIBaseInterfaces;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -10,7 +10,7 @@ uses
 {$ELSE}
     SysUtils
 {$ENDIF}
-    , uBaseNcodingTypes;
+    , BcpBaseNcodingTypes;
 
 type
 

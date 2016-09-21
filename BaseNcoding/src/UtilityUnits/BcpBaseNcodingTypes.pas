@@ -1,4 +1,4 @@
-unit uBaseNcodingTypes;
+unit BcpBaseNcodingTypes;
 
 interface
 

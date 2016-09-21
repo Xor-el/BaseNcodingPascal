@@ -1,4 +1,4 @@
-unit uBase64;
+unit BcpBase64;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -16,10 +16,10 @@ uses
   System.Threading,
   System.Math
 {$ENDIF}
-    , uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 type
 

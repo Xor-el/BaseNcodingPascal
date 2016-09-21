@@ -59,7 +59,7 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
         swapped in Delphi/FreePascal.   
     
     3.  This Library was written with (Delphi 10 Seattle Update 1) but will 
-        work fine with anything from Delphi 2009 and FreePascal 3.0.0 Upwards.
+        work fine with anything from Delphi 2010 and FreePascal 3.0.0 Upwards.
 
     4.  "Parallel version" was implemented using PPL (Parallel Programming Library) 
          but will only work in Delphi XE7 Upwards.
@@ -88,7 +88,7 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 ```pascal
      // Here is a Little Snippet showing Usage for Base32 Operations.  
     uses
-      SysUtils, uBase32, uBaseFactory;
+      SysUtils, BcpBase32, BcpBaseFactory;
 
       procedure TForm1.Button1Click(Sender: TObject);
 	var
@@ -131,7 +131,7 @@ To Run Unit Tests,
 
     Simply compile and run "BaseNcoding.Tests" project in "FreePascal.Tests" Folder.
 
-**For Delphi 2009 and above**
+**For Delphi 2010 and above**
 
    **Method One (Using DUnit Test Runner)**
 

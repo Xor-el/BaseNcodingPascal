@@ -15,9 +15,9 @@ uses
   SysUtils,
   TestFramework,
   BaseTests,
-  uBase85,
-  uUtils,
-  uIBaseInterfaces;
+  BcpBase85,
+  BcpUtils,
+  BcpIBaseInterfaces;
 
 type
   // Test methods for class TBase85

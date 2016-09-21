@@ -10,9 +10,9 @@ uses
   fpcunit,
   testregistry,
   BaseTests,
-  uBase85,
-  uUtils,
-  uIBaseInterfaces;
+  BcpBase85,
+  BcpUtils,
+  BcpIBaseInterfaces;
 
 type
 

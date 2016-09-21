@@ -18,8 +18,8 @@ uses
   EncdDecd,
   TestFramework,
   BaseTests,
-  uBase64,
-  uUtils;
+  BcpBase64,
+  BcpUtils;
 
 type
   // Test methods for class TBase64

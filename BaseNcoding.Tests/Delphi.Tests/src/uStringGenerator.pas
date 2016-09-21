@@ -1,5 +1,6 @@
 unit uStringGenerator;
-
+
+
 interface
 
 uses
@@ -128,4 +129,4 @@ begin
 end;
 
 end.
-
+

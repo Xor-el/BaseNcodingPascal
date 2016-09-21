@@ -1,4 +1,4 @@
-unit IntegerX;
+unit BcpIntegerX;
 
 {$I ..\Include\BaseNcoding.inc}
 

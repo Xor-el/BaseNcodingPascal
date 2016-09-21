@@ -1,4 +1,4 @@
-unit uBase91;
+unit BcpBase91;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -22,10 +22,10 @@ uses
     , Generics.Collections
 {$ENDIF}
 {$ENDIF}
-    , uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 type
 

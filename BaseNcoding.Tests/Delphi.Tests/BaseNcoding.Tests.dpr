@@ -19,6 +19,7 @@ uses
   TestFramework,
   GUITestRunner,
   TextTestRunner,
+  BaseTests in 'src\BaseTests.pas',
   Base32Tests in 'src\Base32Tests.pas',
   Base64Tests in 'src\Base64Tests.pas',
   Base85Tests in 'src\Base85Tests.pas',
@@ -27,28 +28,27 @@ uses
   Base256Tests in 'src\Base256Tests.pas',
   Base1024Tests in 'src\Base1024Tests.pas',
   Base4096Tests in 'src\Base4096Tests.pas',
-  uBase in '..\..\BaseNcoding\src\BaseUnits\uBase.pas',
-  uBase32 in '..\..\BaseNcoding\src\BaseUnits\uBase32.pas',
-  uBase64 in '..\..\BaseNcoding\src\BaseUnits\uBase64.pas',
-  uBase85 in '..\..\BaseNcoding\src\BaseUnits\uBase85.pas',
-  uBase91 in '..\..\BaseNcoding\src\BaseUnits\uBase91.pas',
-  uBase128 in '..\..\BaseNcoding\src\BaseUnits\uBase128.pas',
-  uBase256 in '..\..\BaseNcoding\src\BaseUnits\uBase256.pas',
-  uBase1024 in '..\..\BaseNcoding\src\BaseUnits\uBase1024.pas',
-  uBase4096 in '..\..\BaseNcoding\src\BaseUnits\uBase4096.pas',
-  uBaseBigN in '..\..\BaseNcoding\src\BaseUnits\uBaseBigN.pas',
-  uBaseN in '..\..\BaseNcoding\src\BaseUnits\uBaseN.pas',
-  uZBase32 in '..\..\BaseNcoding\src\BaseUnits\uZBase32.pas',
-  uBaseFactory in '..\..\BaseNcoding\src\BaseUnits\uBaseFactory.pas',
-  uIBaseInterfaces
-    in '..\..\BaseNcoding\src\BaseInterfaces\uIBaseInterfaces.pas',
-  uUtils in '..\..\BaseNcoding\src\UtilityUnits\uUtils.pas',
-  uBaseNcodingTypes
-    in '..\..\BaseNcoding\src\UtilityUnits\uBaseNcodingTypes.pas',
-  IntegerX in '..\..\BaseNcoding\src\UtilityUnits\IntegerX.pas',
-  BaseTests in 'src\BaseTests.pas',
+  BaseNTests in 'src\BaseNTests.pas',
   uStringGenerator in 'src\uStringGenerator.pas',
-  BaseNTests in 'src\BaseNTests.pas';
+  BcpBase in '..\..\BaseNcoding\src\BaseUnits\BcpBase.pas',
+  BcpBase32 in '..\..\BaseNcoding\src\BaseUnits\BcpBase32.pas',
+  BcpBase64 in '..\..\BaseNcoding\src\BaseUnits\BcpBase64.pas',
+  BcpBase85 in '..\..\BaseNcoding\src\BaseUnits\BcpBase85.pas',
+  BcpBase91 in '..\..\BaseNcoding\src\BaseUnits\BcpBase91.pas',
+  BcpBase128 in '..\..\BaseNcoding\src\BaseUnits\BcpBase128.pas',
+  BcpBase256 in '..\..\BaseNcoding\src\BaseUnits\BcpBase256.pas',
+  BcpBase1024 in '..\..\BaseNcoding\src\BaseUnits\BcpBase1024.pas',
+  BcpBase4096 in '..\..\BaseNcoding\src\BaseUnits\BcpBase4096.pas',
+  BcpBaseBigN in '..\..\BaseNcoding\src\BaseUnits\BcpBaseBigN.pas',
+  BcpBaseN in '..\..\BaseNcoding\src\BaseUnits\BcpBaseN.pas',
+  BcpZBase32 in '..\..\BaseNcoding\src\BaseUnits\BcpZBase32.pas',
+  BcpBaseFactory in '..\..\BaseNcoding\src\BaseUnits\BcpBaseFactory.pas',
+  BcpIBaseInterfaces
+    in '..\..\BaseNcoding\src\BaseInterfaces\BcpIBaseInterfaces.pas',
+  BcpUtils in '..\..\BaseNcoding\src\UtilityUnits\BcpUtils.pas',
+  BcpBaseNcodingTypes
+    in '..\..\BaseNcoding\src\UtilityUnits\BcpBaseNcodingTypes.pas',
+  BcpIntegerX in '..\..\BaseNcoding\src\UtilityUnits\BcpIntegerX.pas';
 
 begin
 

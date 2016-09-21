@@ -1,4 +1,4 @@
-﻿unit uBase4096;
+﻿unit BcpBase4096;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -14,10 +14,10 @@ uses
 {$IFDEF FPC}
     , fgl
 {$ENDIF}
-    , uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 type
 

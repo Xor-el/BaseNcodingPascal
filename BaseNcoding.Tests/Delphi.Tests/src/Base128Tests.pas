@@ -15,8 +15,8 @@ uses
   TestFramework,
   SysUtils,
   BaseTests,
-  uBase128,
-  uUtils;
+  BcpBase128,
+  BcpUtils;
 
 type
   // Test methods for class TBase128

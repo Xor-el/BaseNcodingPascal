@@ -12,8 +12,8 @@ uses
   testregistry,
   Base64,
   BaseTests,
-  uBase64,
-  uUtils;
+  BcpBase64,
+  BcpUtils;
 
 type
 

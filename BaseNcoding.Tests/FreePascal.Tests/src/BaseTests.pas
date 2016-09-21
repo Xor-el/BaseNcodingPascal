@@ -9,7 +9,7 @@ uses
   Classes,
   SysUtils,
   testregistry,
-  uIBaseInterfaces;
+  BcpIBaseInterfaces;
 
 type
 

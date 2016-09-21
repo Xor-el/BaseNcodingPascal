@@ -1,4 +1,4 @@
-unit uBase32;
+unit BcpBase32;
 
 {$I ..\Include\BaseNcoding.inc}
 
@@ -14,10 +14,10 @@ uses
 {$IFDEF FPC}
     , fgl
 {$ENDIF}
-    , uBase,
-  uIBaseInterfaces,
-  uBaseNcodingTypes,
-  uUtils;
+    , BcpBase,
+  BcpIBaseInterfaces,
+  BcpBaseNcodingTypes,
+  BcpUtils;
 
 type
 

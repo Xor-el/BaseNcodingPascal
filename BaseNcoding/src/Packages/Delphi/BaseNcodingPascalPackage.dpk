@@ -34,22 +34,22 @@ requires
   soaprtl;
 
 contains
-  uBase in '..\..\BaseUnits\uBase.pas',
-  uBase32 in '..\..\BaseUnits\uBase32.pas',
-  uBase64 in '..\..\BaseUnits\uBase64.pas',
-  uBase85 in '..\..\BaseUnits\uBase85.pas',
-  uBase91 in '..\..\BaseUnits\uBase91.pas',
-  uBase128 in '..\..\BaseUnits\uBase128.pas',
-  uBase256 in '..\..\BaseUnits\uBase256.pas',
-  uBase1024 in '..\..\BaseUnits\uBase1024.pas',
-  uBase4096 in '..\..\BaseUnits\uBase4096.pas',
-  uBaseBigN in '..\..\BaseUnits\uBaseBigN.pas',
-  uBaseN in '..\..\BaseUnits\uBaseN.pas',
-  uZBase32 in '..\..\BaseUnits\uZBase32.pas',
-  uBaseFactory in '..\..\BaseUnits\uBaseFactory.pas',
-  uIBaseInterfaces in '..\..\BaseInterfaces\uIBaseInterfaces.pas',
-  IntegerX in '..\..\UtilityUnits\IntegerX.pas',
-  uBaseNcodingTypes in '..\..\UtilityUnits\uBaseNcodingTypes.pas',
-  uUtils in '..\..\UtilityUnits\uUtils.pas';
+  BcpBase in '..\..\BaseUnits\BcpBase.pas',
+  BcpBase32 in '..\..\BaseUnits\BcpBase32.pas',
+  BcpBase64 in '..\..\BaseUnits\BcpBase64.pas',
+  BcpBase85 in '..\..\BaseUnits\BcpBase85.pas',
+  BcpBase91 in '..\..\BaseUnits\BcpBase91.pas',
+  BcpBase128 in '..\..\BaseUnits\BcpBase128.pas',
+  BcpBase256 in '..\..\BaseUnits\BcpBase256.pas',
+  BcpBase1024 in '..\..\BaseUnits\BcpBase1024.pas',
+  BcpBase4096 in '..\..\BaseUnits\BcpBase4096.pas',
+  BcpBaseBigN in '..\..\BaseUnits\BcpBaseBigN.pas',
+  BcpBaseN in '..\..\BaseUnits\BcpBaseN.pas',
+  BcpZBase32 in '..\..\BaseUnits\BcpZBase32.pas',
+  BcpBaseFactory in '..\..\BaseUnits\BcpBaseFactory.pas',
+  BcpIBaseInterfaces in '..\..\BaseInterfaces\BcpIBaseInterfaces.pas',
+  BcpIntegerX in '..\..\UtilityUnits\BcpIntegerX.pas',
+  BcpBaseNcodingTypes in '..\..\UtilityUnits\BcpBaseNcodingTypes.pas',
+  BcpUtils in '..\..\UtilityUnits\BcpUtils.pas';
 
 end.

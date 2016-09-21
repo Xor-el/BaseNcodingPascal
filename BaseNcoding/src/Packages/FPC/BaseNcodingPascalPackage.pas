@@ -7,9 +7,9 @@ unit BaseNcodingPascalPackage;
 interface
 
 uses
-  uBase, uBase32, uBase64, uBase85, uBase91, uBase128, uBase256, uBase1024, 
-  uBase4096, uBaseBigN, uBaseN, uZBase32, uBaseNcodingTypes, IntegerX, uUtils, 
-  uBaseFactory, uIBaseInterfaces;
+  BcpBase, BcpBase32, BcpBase64, BcpBase85, BcpBase91, BcpBase128, BcpBase256, 
+  BcpBase1024, BcpBase4096, BcpBaseBigN, BcpBaseN, BcpZBase32, 
+  BcpBaseNcodingTypes, BcpIntegerX, BcpUtils, BcpBaseFactory, BcpIBaseInterfaces;
 
 implementation
 

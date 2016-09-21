@@ -15,11 +15,11 @@ uses
   fgl,
   Base64,
   BaseTests,
-  uBase64,
-  uBaseN,
-  uBaseBigN,
-  uUtils,
-  uIBaseInterfaces,
+  BcpBase64,
+  BcpBaseN,
+  BcpBaseBigN,
+  BcpUtils,
+  BcpIBaseInterfaces,
   uStringGenerator;
 
 type

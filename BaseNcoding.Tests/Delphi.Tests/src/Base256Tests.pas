@@ -15,8 +15,8 @@ uses
   SysUtils,
   TestFramework,
   BaseTests,
-  uBase256,
-  uUtils;
+  BcpBase256,
+  BcpUtils;
 
 type
   // Test methods for class TBase256

@@ -5,7 +5,7 @@ interface
 uses
   Classes,
   SysUtils,
-  uIBaseInterfaces;
+  BcpIBaseInterfaces;
 
 type
 
