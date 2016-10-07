@@ -88,7 +88,7 @@ For bits block to chars block, the BigInteger Implementation in my BigNumber Lib
 ```pascal
      // Here is a Little Snippet showing Usage for Base32 Operations.  
     uses
-      SysUtils, BcpBase32, BcpBaseFactory;
+      SysUtils, BcpBase32, BcpIBaseInterfaces, BcpBaseFactory;
 
       procedure TForm1.Button1Click(Sender: TObject);
 	var
