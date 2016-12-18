@@ -178,7 +178,6 @@ begin
         decoded := baseN.Decode(encoded);
         CheckEquals(CompareMem(Pointer(_array), Pointer(decoded), Length(_array) * SizeOf(Byte)), True);
         bytes.Add(testByte);
-        bytes.Add(testByte);
         Inc(i);
       end;
     end;
@@ -206,7 +205,7 @@ begin
     for radix := 2 to Pred(1000) do
     begin
 
-      baseN := TBaseBigN.Create(TStringGenerator.GetAlphabet(integer(radix)),
+      baseN := TBaseBigN.Create(TStringGenerator.GetAlphabet(Integer(radix)),
         256, nil, False, True);
 
       testBytesCount := Max((baseN.BlockBitsCount + 7) div 8,
@@ -225,7 +224,6 @@ begin
         encoded := baseN.Encode(_array);
         decoded := baseN.Decode(encoded);
         CheckEquals(True, CompareMem(Pointer(_array), Pointer(decoded), Length(_array) * SizeOf(Byte)));
-        bytes.Add(testByte);
         bytes.Add(testByte);
         Inc(i);
       end;

@@ -197,7 +197,6 @@ begin
         CheckEquals(CompareMem(Pointer(_array), Pointer(decoded),
           Length(_array) * SizeOf(Byte)), True);
         bytes.Add(testByte);
-        bytes.Add(testByte);
         Inc(i);
       end;
     end;
@@ -245,7 +244,6 @@ begin
         decoded := baseN.Decode(encoded);
         CheckEquals(True, CompareMem(Pointer(_array), Pointer(decoded),
           Length(_array) * SizeOf(Byte)));
-        bytes.Add(testByte);
         bytes.Add(testByte);
         Inc(i);
       end;

@@ -23,6 +23,7 @@ uses
 resourcestring
 
   SInvalidBlock = 'The last block of ASCII85 data cannot be a single byte.';
+  SInvalidCharZ = 'The character ''z'' is invalid inside an ASCII85 block.';
   SInvalidData =
     'ASCII85 encoded data should begin with "%s" and end with "%s"';
 
@@ -272,8 +273,7 @@ begin
           begin
             if (count <> 0) then
             begin
-              raise Exception.Create
-                ('The character ''z'' is invalid inside an ASCII85 block.');
+              raise Exception.CreateRes(@SInvalidCharZ);
             end;
             decodedBlock[0] := 0;
             decodedBlock[1] := 0;

@@ -277,12 +277,12 @@ begin
   end;
 
   lastSpecialInd := Length(data);
-  while (data[(lastSpecialInd - 1) + 1] = Special) do
+  while (data[lastSpecialInd] = Special) do
   begin
     dec(lastSpecialInd);
   end;
   tailLength := Length(data) - lastSpecialInd;
-  SetLength(result, Length(data) div 4 * 5 - tailLength);
+  SetLength(result, (Length(data) div 4) * 5 - tailLength);
   i := 0;
   srcInd := 0;
   length5 := (Length(data) div 4 - 1) * 5;

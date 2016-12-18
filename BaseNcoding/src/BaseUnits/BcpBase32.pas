@@ -144,13 +144,13 @@ begin
           tempResult.Add(Alphabet[(x1 shr 3) + 1]);
           tempResult.Add(Alphabet[((x1 shl 2) and $1C) + 1]);
 
-          tempResult.Add(StringOfChar(Special, 4));
+          tempResult.Add(StringOfChar(Special, 6));
 {$ELSE}
           x1 := data[i];
           tempResult.Append(Alphabet[(x1 shr 3) + 1]);
           tempResult.Append(Alphabet[((x1 shl 2) and $1C) + 1]);
 
-          tempResult.Append(Special, 4);
+          tempResult.Append(Special, 6);
 {$ENDIF}
         end;
 
@@ -164,7 +164,7 @@ begin
           tempResult.Add(Alphabet[((x2 shr 1) and $1F) + 1]);
           tempResult.Add(Alphabet[((x2 shl 4) and $10) + 1]);
 
-          tempResult.Add(StringOfChar(Special, 3));
+          tempResult.Add(StringOfChar(Special, 4));
 {$ELSE}
           x1 := data[i];
           tempResult.Append(Alphabet[(x1 shr 3) + 1]);
@@ -173,7 +173,7 @@ begin
           tempResult.Append(Alphabet[((x2 shr 1) and $1F) + 1]);
           tempResult.Append(Alphabet[((x2 shl 4) and $10) + 1]);
 
-          tempResult.Append(Special, 3);
+          tempResult.Append(Special, 4);
 {$ENDIF}
         end;
       3:
@@ -188,7 +188,7 @@ begin
           tempResult.Add(Alphabet[(((x2 shl 4) and $10) or (x1 shr 4)) + 1]);
           tempResult.Add(Alphabet[((x1 shl 1) and $1E) + 1]);
 
-          tempResult.Add(StringOfChar(Special, 2));
+          tempResult.Add(StringOfChar(Special, 3));
 {$ELSE}
           x1 := data[i];
           tempResult.Append(Alphabet[(x1 shr 3) + 1]);
@@ -199,7 +199,7 @@ begin
           tempResult.Append(Alphabet[(((x2 shl 4) and $10) or (x1 shr 4)) + 1]);
           tempResult.Append(Alphabet[((x1 shl 1) and $1E) + 1]);
 
-          tempResult.Append(Special, 2);
+          tempResult.Append(Special, 3);
 {$ENDIF}
         end;
       4:
@@ -253,7 +253,7 @@ end;
 function TBase32.Decode(const data: TBaseNcodingString): TBytes;
 var
   lastSpecialInd, tailLength, length5, i, srcInd, x1, x2, x3, x4, x5, x6, x7,
-    x8: Integer;
+    x8, additionalBytes, diff, tempLen: Integer;
 
 begin
   if TUtils.IsNullOrEmpty(data) then
@@ -263,14 +263,31 @@ begin
     result := Nil;
     Exit;
   end;
+
   lastSpecialInd := Length(data);
-  while (data[(lastSpecialInd - 1) + 1] = Special) do
+  while (data[lastSpecialInd] = Special) do
   begin
     dec(lastSpecialInd);
   end;
   tailLength := Length(data) - lastSpecialInd;
-  SetLength(result, (((Length(data)) + 7) div 8 * 5 - tailLength));
-  length5 := Length(result) div 5 * 5;
+  additionalBytes := 0;
+
+  case (tailLength) of
+    6:
+      additionalBytes := 4;
+    4:
+      additionalBytes := 3;
+    3:
+      additionalBytes := 2;
+    1:
+      additionalBytes := 1;
+  end;
+
+  diff := tailLength - additionalBytes;
+  tailLength := additionalBytes;
+  tempLen := Length(data) - diff;
+  SetLength(result, ((tempLen + 7) div 8) * 5 - tailLength);
+  length5 := (Length(result) div 5) * 5;
   i := 0;
   srcInd := 0;
 

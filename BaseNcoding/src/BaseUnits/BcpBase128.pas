@@ -343,12 +343,12 @@ begin
     Exit;
   end;
   lastSpecialInd := Length(data);
-  while (data[(lastSpecialInd - 1) + 1] = Special) do
+  while (data[lastSpecialInd] = Special) do
   begin
     dec(lastSpecialInd);
   end;
   tailLength := Length(data) - lastSpecialInd;
-  SetLength(result, (Length(data) + 7) div 8 * 7 - tailLength);
+  SetLength(result, ((Length(data) + 7) div 8) * 7 - tailLength);
   length7 := Length(result) div 7 * 7;
   i := 0;
   srcInd := 0;

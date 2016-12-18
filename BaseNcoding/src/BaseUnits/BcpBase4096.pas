@@ -431,7 +431,7 @@ begin
   end;
 
   lastSpecialInd := Length(data);
-  while (data[(lastSpecialInd - 1) + 1] = Special) do
+  while (data[lastSpecialInd] = Special) do
   begin
     dec(lastSpecialInd);
   end;
